@@ -1,0 +1,62 @@
+
+<canvas id="c"></canvas>
+
+<div id="title" class="panel">
+  <h1>MIRTEC <b>MV-9DL</b> · 3D AOI</h1>
+  <p>In-line dual-lane 2D/3D automated optical inspection — single optical head serving two conveyor lanes.</p>
+  <div id="specBtn">▸ Machine specifications</div>
+  <div id="spec"><table>
+    <tr><td>Footprint</td><td>1250 × 1500 × 1600 mm</td></tr>
+    <tr><td>Weight</td><td>≈ 1400 kg (MV-9DL)</td></tr>
+    <tr><td>PCB, dual lane</td><td>50 × 50 – 330 × 280 mm</td></tr>
+    <tr><td>Top camera</td><td>15 MP CoaXPress, telecentric lens</td></tr>
+    <tr><td>FOV</td><td>58.56 × 58.56 mm at 15 µm/pixel</td></tr>
+    <tr><td>Side cameras</td><td>4 × 10 MP SIDE-VIEWER</td></tr>
+    <tr><td>3D</td><td>Digital multi-frequency moiré, ±3 µm</td></tr>
+    <tr><td>Lighting</td><td>Multi-phase colour LED</td></tr>
+    <tr><td>Clearance</td><td>45 mm top / 25 mm bottom</td></tr>
+    <tr><td>Drive</td><td>Linear motor, ±2 µm repeatability</td></tr>
+    <tr><td>Utilities</td><td>200–240 V 1.1 kW · air 0.5 MPa</td></tr>
+    <tr><td>Demo board</td><td>250 × 200 mm, 20 FOV</td></tr>
+  </table></div>
+</div>
+
+<div id="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click the hood or the cabinet doors to open them</div>
+
+<div id="hud" class="panel">
+  <h2>INSPECTION STATUS</h2>
+  <div class="row"><span>Head</span><span id="hState" class="pill idle">IDLE</span></div>
+  <div class="row"><span>Capture</span><span id="phase">—</span></div>
+  <div class="row"><span>FOV</span><span id="fov" class="big">0 / 20</span></div>
+  <div class="bar"><i id="fovBar"></i></div>
+  <div class="row"><span>Lane 1 (front)</span><span id="l1" class="pill idle">—</span></div>
+  <div class="row"><span>Lane 2 (rear)</span><span id="l2" class="pill idle">—</span></div>
+  <div class="row" style="margin-top:6px"><span>Boards inspected</span><span id="nIns" class="big">0</span></div>
+  <div class="row"><span>Pass / NG</span><span><b id="nOk" style="color:var(--ok)">0</b> / <b id="nNg" style="color:var(--ng)">0</b></span></div>
+  <div class="row"><span>First-pass yield</span><span id="yld">—</span></div>
+  <div class="row"><span>Last cycle time</span><span id="ct">—</span></div>
+  <div id="log"></div>
+</div>
+
+<div id="inset" class="panel"><div class="hd"><span><i id="rec"></i>TOP CAMERA · 2D</span><b id="insL">LIVE</b></div><div class="cross"></div></div>
+<div id="insetR" class="panel"><div class="hd"><span>3D HEIGHT MAP</span><b id="insR">—</b></div><div class="scale"></div></div>
+
+<div id="bar" class="panel">
+  <button id="bHood">Open hood</button>
+  <button id="bXray">X-ray covers</button>
+  <button id="bLab">Labels</button>
+  <div class="sep"></div>
+  <button data-v="over" class="on">Overview</button>
+  <button data-v="inside">Inside</button>
+  <button data-v="follow">Follow head</button>
+  <button data-v="board">Board close-up</button>
+  <button data-v="top">Top</button>
+  <div class="sep"></div>
+  <button id="bPause">Pause</button>
+  <button data-s="0.5">0.5×</button>
+  <button data-s="1" class="on">1×</button>
+  <button data-s="2">2×</button>
+  <button data-s="4">4×</button>
+</div>
+<div id="tags"></div>
+

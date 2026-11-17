@@ -1,0 +1,62 @@
+
+<canvas id="c"></canvas>
+
+<div id="title" class="panel">
+  <h1>Koh Young <b>aSPIre3</b> · 3D SPI</h1>
+  <p>In-line dual-lane 3D solder paste inspection — measures the volume, height, area and offset of every paste deposit after the printer.</p>
+  <div id="specBtn">▸ Machine specifications</div>
+  <div id="spec"><table>
+    <tr><td>Footprint</td><td>1000 × 1460 × 1727 mm (L, dual lane)</td></tr>
+    <tr><td>Weight</td><td>≈ 650 kg</td></tr>
+    <tr><td>PCB, dual lane</td><td>50 × 50 – 490 × 580 mm</td></tr>
+    <tr><td>Transfer height</td><td>870 – 950 mm (shown at 900)</td></tr>
+    <tr><td>Camera</td><td>12 MP, telecentric lens</td></tr>
+    <tr><td>FOV</td><td>61.44 × 46.08 mm at 15 µm (40.96 × 30.72 at 10 µm)</td></tr>
+    <tr><td>3D</td><td>Shadow-free moiré, 4-way projection</td></tr>
+    <tr><td>Z resolution</td><td>0.37 µm · height accuracy 1 µm</td></tr>
+    <tr><td>Illumination</td><td>IR-RGB LED dome</td></tr>
+    <tr><td>Speed</td><td>29 – 63 cm²/s</td></tr>
+    <tr><td>Utilities</td><td>200–240 V · air 5 kgf/cm²</td></tr>
+    <tr><td>Demo board</td><td>250 × 200 mm, 25 FOV, ~2000 deposits</td></tr>
+  </table></div>
+</div>
+
+<div id="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click the window cover or the front door to open them</div>
+
+<div id="hud" class="panel">
+  <h2>INSPECTION STATUS</h2>
+  <div class="row"><span>Head</span><span id="hState" class="pill idle">IDLE</span></div>
+  <div class="row"><span>Capture</span><span id="phase">—</span></div>
+  <div class="row"><span>FOV</span><span id="fov" class="big">0 / 20</span></div>
+  <div class="bar"><i id="fovBar"></i></div>
+  <div class="row"><span>Lane 1 (front)</span><span id="l1" class="pill idle">—</span></div>
+  <div class="row"><span>Lane 2 (rear)</span><span id="l2" class="pill idle">—</span></div>
+  <div class="row" style="margin-top:6px"><span>Boards inspected</span><span id="nIns" class="big">0</span></div>
+  <div class="row"><span>Pass / NG</span><span><b id="nOk" style="color:var(--ok)">0</b> / <b id="nNg" style="color:var(--ng)">0</b></span></div>
+  <div class="row"><span>First-pass yield</span><span id="yld">—</span></div>
+  <div class="row"><span>Last cycle time</span><span id="ct">—</span></div>
+  <div id="log"></div>
+</div>
+
+<div id="inset" class="panel"><div class="hd"><span><i id="rec"></i>12 MP CAMERA · 2D</span><b id="insL">LIVE</b></div><div class="cross"></div></div>
+<div id="insetR" class="panel"><div class="hd"><span>3D PASTE HEIGHT</span><b id="insR">—</b></div><div class="scale"></div></div>
+
+<div id="bar" class="panel">
+  <button id="bHood">Open cover</button>
+  <button id="bXray">X-ray covers</button>
+  <button id="bLab">Labels</button>
+  <div class="sep"></div>
+  <button data-v="over" class="on">Overview</button>
+  <button data-v="inside">Inside</button>
+  <button data-v="follow">Follow head</button>
+  <button data-v="board">Board close-up</button>
+  <button data-v="top">Top</button>
+  <div class="sep"></div>
+  <button id="bPause">Pause</button>
+  <button data-s="0.5">0.5×</button>
+  <button data-s="1" class="on">1×</button>
+  <button data-s="2">2×</button>
+  <button data-s="4">4×</button>
+</div>
+<div id="tags"></div>
+

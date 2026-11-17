@@ -1,0 +1,64 @@
+
+<canvas id="c"></canvas>
+
+<div id="title" class="panel">
+  <h1>EKRA <b>SERIO 5000</b> · Stencil printer</h1>
+  <p>In-line solder paste printer — vision alignment, closed-loop squeegee head, automatic stencil underside cleaning.</p>
+  <div id="specBtn">▸ Machine specifications</div>
+  <div id="spec"><table>
+    <tr><td>Footprint</td><td>1180 × 1840 × 1606 mm</td></tr>
+    <tr><td>Weight</td><td>≈ 1200 kg</td></tr>
+    <tr><td>Print format</td><td>80 × 50 – 510 × 510 mm</td></tr>
+    <tr><td>Board thickness</td><td>0.2 – 6 mm</td></tr>
+    <tr><td>Stencil frame</td><td>450 × 450 – 800 × 900 mm</td></tr>
+    <tr><td>Core cycle time</td><td>7 s + print</td></tr>
+    <tr><td>Alignment</td><td>± 12.5 µm @ 6σ (EVA vision)</td></tr>
+    <tr><td>Print repeatability</td><td>± 20 µm @ 6σ</td></tr>
+    <tr><td>Squeegee</td><td>1 – 300 mm/s · 40 – 250 N</td></tr>
+    <tr><td>Transport height</td><td>920 ± 50 mm (shown at 900)</td></tr>
+    <tr><td>Utilities</td><td>400 V 2 kW · air 5–10 bar</td></tr>
+    <tr><td>Demo board</td><td>250 × 200 mm, 0.13 mm stencil</td></tr>
+  </table></div>
+</div>
+
+<div id="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click the hood to open it</div>
+
+<div id="hud" class="panel">
+  <h2>PRINT PROCESS</h2>
+  <div class="row"><span>Step</span><span id="hState" class="pill idle">IDLE</span></div>
+  <div class="row"><span>Detail</span><span id="phase">—</span></div>
+  <div class="row"><span>Sequence</span><span id="stepN" class="big">—</span></div>
+  <div class="bar"><i id="stepBar"></i></div>
+  <div class="row"><span>Squeegee force</span><span id="force">—</span></div>
+  <div class="row"><span>Print speed</span><span id="spd">—</span></div>
+  <div class="row"><span>Offset X / Y / θ</span><span id="offs">—</span></div>
+  <div class="row" style="margin-top:6px"><span>Boards printed</span><span id="nPr" class="big">0</span></div>
+  <div class="row"><span>Last cycle time</span><span id="ct">—</span></div>
+  <div class="row"><span>Prints since clean</span><span id="sc">0 / 4</span></div>
+  <div class="row"><span>Stencil cleans</span><span id="ncl">0</span></div>
+  <div id="log"></div>
+</div>
+
+<div id="inset" class="panel"><div class="hd"><span><i id="rec"></i>EVA CAMERA · BOARD</span><b id="insL">LIVE</b></div><div class="cross"></div></div>
+
+<div id="bar" class="panel">
+  <button id="bHood">Open hood</button>
+  <button id="bXray">X-ray covers</button>
+  <button id="bSten">See-through stencil</button>
+  <button id="bLab">Labels</button>
+  <div class="sep"></div>
+  <button data-v="over" class="on">Overview</button>
+  <button data-v="inside">Inside</button>
+  <button data-v="head">Print head</button>
+  <button data-v="nest">Under stencil</button>
+  <button data-v="out">Printed board</button>
+  <button data-v="top">Top</button>
+  <div class="sep"></div>
+  <button id="bPause">Pause</button>
+  <button data-s="0.5">0.5×</button>
+  <button data-s="1" class="on">1×</button>
+  <button data-s="2">2×</button>
+  <button data-s="4">4×</button>
+</div>
+<div id="tags"></div>
+
