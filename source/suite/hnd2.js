@@ -577,5 +577,7 @@ function frame(){
 }
 camera.position.set(3000,2200,3600);controls.target.set(0,900,0);controls.maxDistance=26000;
 window.__sim={MACH,selectMachine,setMode,views,setHoods,get time(){return simTime;},get boards(){return boards;},ff:s=>{const n=Math.round(s/.02);for(let i=0;i<n;i++){simTime+=.02;for(let k=0;k<cos.length;k++)cos[k].step(.02);cos=cos.filter(c=>!c.done);}}};
-selectMachine(0,false);
+{const h=location.hash.slice(1).toLowerCase(),k=MACH.findIndex(m=>m.key===h||m.name.toLowerCase().split(' ')[0]===h);
+  if(h==='line'){sel=0;setMode(true);}else selectMachine(k>=0?k:0,false);}
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1).toLowerCase();if(h==='line'){setMode(true);return;}const k=MACH.findIndex(m=>m.key===h||m.name.toLowerCase().split(' ')[0]===h);if(k>=0){if(lineMode)setMode(false);selectMachine(k);}});
 frame();

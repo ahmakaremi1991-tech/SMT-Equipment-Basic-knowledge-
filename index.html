@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMT Equipment – Basic Knowledge</title>
+<meta name="description" content="Interactive 3D simulations of SMT and board-handling equipment, with the basic knowledge behind each machine.">
+<style>
+:root{--bg:#10151d;--card:#161d28;--line:rgba(120,160,220,.22);--tx:#dfe8f5;--mut:#8fa3bd;--acc:#1e6fd9;--acc2:#5b9cf0;--chip:rgba(255,255,255,.06);--know:rgba(30,111,217,.10);color-scheme:dark}
+:root[data-theme=light]{--bg:#eef1f5;--card:#ffffff;--line:#d3dae3;--tx:#17202a;--mut:#5a6876;--acc:#1e6fd9;--acc2:#1e6fd9;--chip:#f2f5f8;--know:#eef4fd;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:36px 16px 48px}
+.top{display:flex;align-items:flex-start;gap:16px}
+.top>div{flex:1}
+h1{margin:0;font-size:30px;font-weight:900;letter-spacing:.05em}
+.lead{color:var(--mut);max-width:780px;margin:8px 0 18px}
+.theme{flex:none;display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.theme button{border:0;background:var(--chip);color:var(--mut);padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+.theme button.on{background:var(--acc);color:#fff}
+nav.cats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px}
+nav.cats a{font-size:12.5px;font-weight:600;text-decoration:none;color:var(--mut);background:var(--chip);border:1px solid var(--line);border-radius:99px;padding:4px 11px}
+nav.cats a:hover{color:var(--tx);border-color:var(--acc2)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0 0 26px;font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.05em}
+.flow a{color:var(--tx);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--card)}
+.flow a:hover{border-color:var(--acc2);color:var(--acc2)}
+.flow i{color:var(--mut);font-style:normal}
+.flow .sep{width:100%;height:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:var(--acc2);box-shadow:0 10px 28px rgba(0,0,0,.28)}
+.card a.pic{display:block;aspect-ratio:16/10;background:#0d1118;overflow:hidden}
+.card img{display:block;width:100%;height:100%;object-fit:cover}
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:7px;flex:1}
+.body h2{margin:0;font-size:16px;font-weight:800;letter-spacing:.04em}
+.body h2 a{color:var(--tx);text-decoration:none}.body h2 a:hover{color:var(--acc2)}
+.body p{margin:0;color:var(--mut);font-size:13.5px}
+.know{background:var(--know);border-left:3px solid var(--acc);border-radius:0 6px 6px 0;padding:6px 9px;font-size:12.8px;color:var(--tx)}
+.know b{color:var(--acc2);font-size:10.5px;letter-spacing:.12em;display:block;margin-bottom:1px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px}
+.tags span{font:600 11px Consolas,Menlo,monospace;padding:2px 7px;border-radius:5px;background:var(--chip);border:1px solid var(--line);color:var(--mut)}
+.badge{font:700 10px "Segoe UI",Arial,sans-serif;letter-spacing:.12em;color:#fff;background:var(--acc);border-radius:5px;padding:2px 7px;vertical-align:3px;margin-left:6px}
+.hero{grid-column:1/-1;flex-direction:row}
+.hero a.pic{flex:1.45;aspect-ratio:auto;min-height:340px}
+.hero .body{flex:1;padding:20px 22px}
+.hero .body h2{font-size:22px}
+.hero .body p{font-size:14.5px}
+@media (max-width:760px){.hero{flex-direction:column}.hero a.pic{min-height:0;aspect-ratio:16/10}.top{flex-direction:column}}
+h3{margin:34px 0 4px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);scroll-margin-top:12px}
+.catnote{margin:0 0 12px;color:var(--mut);font-size:13px;max-width:820px}
+footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('smt-theme')||'dark'}catch(e){}</script>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div>
+<h1>SMT EQUIPMENT – BASIC KNOWLEDGE</h1>
+<p class="lead">Interactive 3D simulations of the equipment in an SMT (surface-mount technology) line, machine by machine, with the basic knowledge behind each one: what it does, how it works and the key numbers. Every machine runs its own process and boards pass from machine to machine as on a real line. Open a page, drag to rotate, scroll to zoom, and open the covers to look inside.</p>
+</div>
+<div class="theme"><button data-t="light">White</button><button data-t="dark">Dark gray</button></div></div>
+
+<nav class="cats">
+  <a href="#printing">Printing &amp; paste inspection</a><a href="#placement">Placement</a><a href="#soldering">Soldering</a><a href="#inspection">Inspection</a>
+  <a href="#loading">Loading &amp; unloading</a><a href="#marking">Marking &amp; traceability</a><a href="#transport">Transport &amp; buffering</a>
+</nav>
+
+<div class="flow">
+  <a href="machines/handling_line.html#loader">LOADER</a><i>›</i><a href="machines/handling_line.html#destacker">DESTACKER</a><i>›</i><a href="machines/handling_line.html#laser">LASER</a><i>›</i><a href="machines/handling_line.html#cleaning">CONVEYOR</a><i>›</i><a href="machines/handling_line.html#shuttle">SHUTTLE</a><i>›</i><a href="machines/handling_line.html#scanner">SCANNER</a><i>›</i><a href="machines/handling_line.html#fifo">FIFO</a><i>›</i><a href="machines/handling_line.html#inverter">INVERTER</a><i>›</i><a href="machines/handling_line.html#unloader">UNLOADER</a>
+  <span class="sep"></span>
+  <a href="machines/printer.html">PRINTER</a><i>›</i><a href="machines/spi.html">SPI</a><i>›</i><a href="machines/placement.html">PLACEMENT</a><i>›</i><a href="machines/reflow.html">REFLOW</a><i>›</i><a href="machines/aoi.html">AOI</a>
+</div>
+
+<div class="grid">
+  <article class="card hero">
+    <a class="pic" href="machines/handling_line.html#line"><img src="img/line.jpg" width="800" height="500" alt="Nine board-handling machines connected from loader to unloader"></a>
+    <div class="body">
+      <h2><a href="machines/handling_line.html#line">Board handling line — loader to unloader</a><span class="badge">START HERE</span></h2>
+      <p>Nine handling machines connected into one line: boards leave the magazine loader, get a laser-marked 2D code, split onto two lanes, are scanned, buffered, flipped and pushed back into magazines. Live state for every machine and the line output rate. Switch to any single machine from the bottom bar.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Handling machines do not change the board; they move, buffer, turn and identify it so the process machines never wait. They talk to each other through the SMEMA "board available / machine ready" handshake.</div>
+      <div class="tags"><span>9 machines</span><span>1 → 2 lanes</span><span>~450 boards/h</span><span>950 mm transport</span></div>
+    </div>
+  </article>
+</div>
+
+<h3 id="printing">Printing &amp; paste inspection</h3>
+<p class="catnote">The first SMT steps: put the right amount of solder paste on every pad, then measure it — most solder defects start here.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/printer.html"><img src="img/printer.jpg" width="800" height="500" loading="lazy" alt="Solder paste stencil printer"></a>
+    <div class="body"><h2><a href="machines/printer.html">Solder paste printer</a></h2>
+      <p>Stencil printing with vision alignment, closed-loop squeegee and automatic under-stencil cleaning.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>A steel stencil with laser-cut apertures sits on the board; the squeegee pushes paste through the apertures onto the pads. Print quality depends on squeegee pressure, speed, snap-off and stencil cleanliness.</div>
+      <div class="tags"><span>±12.5 µm alignment</span><span>7 s core cycle</span><span>0.13 mm stencil</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/spi.html"><img src="img/spi.jpg" width="800" height="500" loading="lazy" alt="3D solder paste inspection machine"></a>
+    <div class="body"><h2><a href="machines/spi.html">SPI — 3D solder paste inspection</a></h2>
+      <p>Dual-lane 3D measurement of every paste deposit with moiré projection and an RGB light ring.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Projected fringe patterns bend over the paste; from the bend the machine calculates height, area, volume and offset of each deposit and flags insufficient, excessive, missing, shifted or bridged paste.</div>
+      <div class="tags"><span>25 FOV</span><span>0–250 µm height</span><span>2 lanes</span></div></div>
+  </article>
+</div>
+
+<h3 id="placement">Placement</h3>
+<p class="catnote">Components are picked from feeders and placed on the wet paste.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/placement.html"><img src="img/placement.jpg" width="800" height="500" loading="lazy" alt="Dual-gantry pick-and-place machine"></a>
+    <div class="body"><h2><a href="machines/placement.html">Pick-and-place</a></h2>
+      <p>Dual-lane, dual-gantry placement: two 16-nozzle heads, four feeder carts, on-the-fly component recognition.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Each head picks parts with vacuum nozzles from tape feeders, a camera measures each part's offset and rotation on the fly, and the head corrects it while placing. Speed is given in cph (components per hour).</div>
+      <div class="tags"><span>289 parts</span><span>~99 s / board / lane</span><span>2 × 16 nozzles</span></div></div>
+  </article>
+</div>
+
+<h3 id="soldering">Soldering</h3>
+<p class="catnote">The paste is melted into solder joints.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/reflow.html"><img src="img/reflow.jpg" width="800" height="500" loading="lazy" alt="Convection reflow oven"></a>
+    <div class="body"><h2><a href="machines/reflow.html">Reflow oven</a></h2>
+      <p>Dual-lane convection reflow with 9 preheat, 4 peak and 4 cooling zones, circulation fans and a live thermal profile and solder-joint view.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>The board follows a thermal profile: preheat, soak (flux activates and solvents evaporate), reflow above the liquidus (217 °C for SAC305) and controlled cooling. Peak temperature and time above liquidus decide joint quality.</div>
+      <div class="tags"><span>peak ~245 °C</span><span>TAL ~85 s</span><span>17 zones · N₂</span></div></div>
+  </article>
+</div>
+
+<h3 id="inspection">Inspection</h3>
+<p class="catnote">The finished joints and components are checked before the board leaves the line.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/aoi.html"><img src="img/aoi.jpg" width="800" height="500" loading="lazy" alt="3D automated optical inspection machine"></a>
+    <div class="body"><h2><a href="machines/aoi.html">AOI — automated optical inspection</a></h2>
+      <p>Dual-lane 2D/3D inspection with a multi-colour light dome, four side cameras and moiré 3D.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Images under different light angles and colours reveal missing, shifted, tombstoned, reversed or lifted parts and bad fillets. Calls are judged against limits; a "false call" is a good part flagged as bad.</div>
+      <div class="tags"><span>20 FOV</span><span>15 MP</span><span>2 lanes</span></div></div>
+  </article>
+</div>
+
+<h3 id="loading">Board handling — loading &amp; unloading</h3>
+<p class="catnote">Boards enter and leave the line in magazines or stacks.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#loader"><img src="img/loader.jpg" width="800" height="500" loading="lazy" alt="Triple-magazine line loader"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#loader">Triple-magazine line loader</a></h2>
+      <p>Three magazines side by side on one lift platform; a shuttle conveyor travels to each one.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>The lift indexes the magazine slot to conveyor height, a puller cylinder draws the board onto the shuttle conveyor and the shuttle brings it to the line. With three magazines the operator can swap an empty one without stopping.</div>
+      <div class="tags"><span>3 magazines</span><span>≈ 18–24 s / board</span><span>1080 × 1750 mm</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#destacker"><img src="img/destacker.jpg" width="800" height="500" loading="lazy" alt="Bare-board destacker"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#destacker">Destacker (logistics loader)</a></h2>
+      <p>Buffer for 8 bare-board stacks plus a separator that feeds single boards to the line.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Bare boards often arrive stacked, not in magazines. The separator takes the top board off the stack with a clamp, so the force does not depend on the stack weight; stacks are processed first in, first out.</div>
+      <div class="tags"><span>8 batches × 60 mm</span><span>FIFO</span><span>clamp separator</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#unloader"><img src="img/unloader.jpg" width="800" height="500" loading="lazy" alt="Triple-magazine line unloader"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#unloader">Triple-magazine line unloader</a></h2>
+      <p>Mirror of the loader: the shuttle takes boards from lane 1 or 2 and pushes them into magazines.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>The shuttle conveyor lines up with the incoming lane, then with the free magazine slot, and a pusher cylinder pushes the board fully in. Magazines fill top to bottom; good and bad boards can go to different magazines.</div>
+      <div class="tags"><span>3 magazines</span><span>≈ 18–22 s / board</span><span>lane 1 + 2</span></div></div>
+  </article>
+</div>
+
+<h3 id="marking">Board handling — marking &amp; traceability</h3>
+<p class="catnote">Every board gets a unique identity that every later machine can read.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#laser"><img src="img/laser.jpg" width="800" height="500" loading="lazy" alt="Inline laser marker"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#laser">Laser marker</a></h2>
+      <p>Marks a 2D data-matrix code on each bare board and reads it back with a camera.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>A CO₂ or fibre laser on X/Y axes burns the code into the solder resist while a side clamp holds the board. The code links the board to all its process and test data (traceability).</div>
+      <div class="tags"><span>80 × 80 mm window</span><span>±100 µm</span><span>830 × 1565 mm</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#scanner"><img src="img/scanner.jpg" width="800" height="500" loading="lazy" alt="Dual-track scanning conveyor"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#scanner">Scanning conveyor</a></h2>
+      <p>Dual-track 500 mm conveyor with one code reader per lane.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Reading the code at line entry registers the board in the MES (manufacturing system), which then sends each machine the right program. A "no read" stops the board before it is processed.</div>
+      <div class="tags"><span>2 readers</span><span>500 mm</span><span>dual track</span></div></div>
+  </article>
+</div>
+
+<h3 id="transport">Board handling — transport &amp; buffering</h3>
+<p class="catnote">Conveyors link machines, split lanes, absorb speed differences and turn boards.</p>
+<div class="grid">
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#cleaning"><img src="img/conveyor.jpg" width="800" height="500" loading="lazy" alt="Linking conveyor"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#cleaning">Linking conveyor</a></h2>
+      <p>1000 mm conveyor in two 500 mm zones between machines.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Each zone holds one board, so a two-zone conveyor is also a small buffer. Belt width is adjusted to the board with a crank; one rail is fixed (usually the front) and the other moves.</div>
+      <div class="tags"><span>2 × 500 mm</span><span>14 m/min</span><span>ESD belt</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#shuttle"><img src="img/shuttle.jpg" width="800" height="500" loading="lazy" alt="Dual-track shuttle conveyor"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#shuttle">Shuttle conveyor</a></h2>
+      <p>Turns one line into two lanes: the conveyor travels sideways, then its section extends to hand the board to the next machine.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Dual-lane machines double output without doubling floor space; the shuttle alternates boards between lanes and skips a lane that is full downstream.</div>
+      <div class="tags"><span>1 → 2 lanes</span><span>500 mm extension</span><span>servo traverse</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#fifo"><img src="img/fifo.jpg" width="800" height="500" loading="lazy" alt="Dual-track belt FIFO buffer"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#fifo">Belt FIFO buffer</a></h2>
+      <p>Two stacks of belt shelves, one per lane, each storing 20 boards.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>A buffer absorbs short stops downstream so upstream machines keep running. FIFO (first in, first out) keeps board order; LIFO and bypass are other modes.</div>
+      <div class="tags"><span>20 per lane</span><span>27 mm pitch</span><span>FIFO / LIFO / bypass</span></div></div>
+  </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#inverter"><img src="img/inverter.jpg" width="800" height="500" loading="lazy" alt="Board inverter"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#inverter">Board inverter</a></h2>
+      <p>Flips each board 180° about the travel axis.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Double-sided boards are built one side at a time; the inverter turns the board over so the second side can be printed and populated in the same line.</div>
+      <div class="tags"><span>180° flip</span><span>≈ 8 s cycle</span><span>torque limiter</span></div></div>
+  </article>
+</div>
+
+<footer>Generic machine models with dimensions and process data taken from manufacturer datasheets of each machine class; no brands. Units in millimetres. Every page is one self-contained HTML file built with three.js and works offline. Theme choice (White / Dark gray) is shared by all pages.</footer>
+</div>
+<script>
+const r=document.documentElement;function set(t){r.dataset.theme=t;try{localStorage.setItem('smt-theme',t)}catch(e){}document.querySelectorAll('.theme button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));}
+document.querySelectorAll('.theme button').forEach(b=>b.onclick=()=>set(b.dataset.t));set(r.dataset.theme);
+</script>
+</body>
+</html>

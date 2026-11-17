@@ -3209,7 +3209,7 @@ const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line 
   rows(m){return[['Magazine 1 / 2 / 3',m.mags.map(g=>g.present?g.boards.filter(b=>b).length+'/'+MG.use:'—').join(' · ')],['Boards stored',String(m.stored)],['Magazine changes (operator)',String(m.ops)]];}
 });
 
-/* ---------- line layout (gap before the shuttle for its extending input section) ---------- */
+/* ---------- line layout (gap before the scanner for the shuttle output section) ---------- */
 const TOTAL=MACH.reduce((s,m)=>s+m.L+m.gap,0);
 {let x=-TOTAL/2;MACH.forEach((m,i)=>{m.i=i;x+=m.gap;m.x0=x;m.x1=x+m.L;m.cx=x+m.L/2;m.X=lx=>m.cx+lx;m.g.position.x=m.cx;m.build(m);x+=m.L;});}
 /* ===================================================================
@@ -3339,7 +3339,9 @@ function frame(){
 }
 camera.position.set(3000,2200,3600);controls.target.set(0,900,0);controls.maxDistance=26000;
 window.__sim={MACH,selectMachine,setMode,views,setHoods,get time(){return simTime;},get boards(){return boards;},ff:s=>{const n=Math.round(s/.02);for(let i=0;i<n;i++){simTime+=.02;for(let k=0;k<cos.length;k++)cos[k].step(.02);cos=cos.filter(c=>!c.done);}}};
-selectMachine(0,false);
+{const h=location.hash.slice(1).toLowerCase(),k=MACH.findIndex(m=>m.key===h||m.name.toLowerCase().split(' ')[0]===h);
+  if(h==='line'){sel=0;setMode(true);}else selectMachine(k>=0?k:0,false);}
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1).toLowerCase();if(h==='line'){setMode(true);return;}const k=MACH.findIndex(m=>m.key===h||m.name.toLowerCase().split(' ')[0]===h);if(k>=0){if(lineMode)setMode(false);selectMachine(k);}});
 frame();
 
 </script>
