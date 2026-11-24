@@ -134,12 +134,28 @@ function shell(g,x0,x1,z0,z1,y0,y1,mat,o={}){ // closed box with optional open f
   [[x0+6,o.left],[x1-6,o.right]].forEach(([x,ln])=>{if(ln===false)return;if(ln&&ln.length)endWall(g,x,z0,z1,y0,y1,ln,mat);else P(g,12,y1-y0,z1-z0,mat,x,(y0+y1)/2,(z0+z1)/2);});}
 
 /* ---------- triple-magazine handler (loader / unloader share the design) ---------- */
-const MG={L:355,W:320,H:570,base:40,pitch:20,slots:25,use:20};   // max magazine 355 x 320 x 570 (M size), top 5 slots empty
-function magMesh(par){const g=new THREE.Group();par.add(g);
-  [-1,1].forEach(s=>{P(g,MG.L,MG.H,8,M.mag,0,MG.H/2,s*(MG.W/2-4));for(let k=0;k<MG.slots;k++)P(g,MG.L-30,3,10,M.magD,0,MG.base+k*MG.pitch-3,s*(MG.W/2-12));
-    P(g,40,MG.H,MG.W,M.mag,s*(MG.L/2-20),MG.H/2,0);});
-  P(g,MG.L,10,MG.W,M.magD,0,5,0);P(g,MG.L,10,MG.W,M.magD,0,MG.H-5,0);P(g,80,24,30,M.black,0,MG.H+12,0);
-  const tag=label(g,'175',60,24,0,MG.H-30,MG.W/2+1,{bg:'#e3a52a',fg:'#222',pw:120,size:.7});return g;}
+const MG={L:355,W:250,H:570,base:40,pitch:20,tooth:10,slots:25,use:20};   // 355 long; width set to the board; comb rails every 10 mm, a board every 2nd slot (20 mm) so the gap is visible; top 5 positions empty
+M.magW=std(0xd9dbd7,.62,.05);M.comb=std(0x18191b,.7,.05);
+const MAGT=(function(){                       // build the magazine once, merged per material, then share the geometry
+  const parts={w:[],c:[]};const L=MG.L,W=MG.W,H=MG.H;
+  const add=(k,w,h,d,x,y,z,rx=0,rz=0)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);if(rz)g.rotateZ(rz);g.translate(x,y,z);parts[k].push(g);};
+  [-1,1].forEach(s=>{const zw=s*(W/2-4);
+    [-1,1].forEach(e=>add('w',36,H,10,e*(L/2-18),H/2,zw));
+    add('w',L,34,10,0,H-17,zw);add('w',L,30,10,0,15,zw);
+    const dl=Math.hypot(L-72,H-64),an=Math.atan2(H-64,L-72);
+    add('w',dl,9,5,0,H/2,s*(W/2+1),0,an);add('w',dl,9,5,0,H/2,s*(W/2+1),0,-an);
+    add('c',L-80,H-70,3,0,H/2,s*(W/2-10.5));
+    for(let j=0;j<(H-90)/MG.tooth;j++)add('c',L-84,2.6,10,0,MG.base+j*MG.tooth-BT/2-1.3,s*(W/2-17));
+    for(let j=0;j<(H-90)/MG.tooth;j+=2)[-1,1].forEach(e=>add('c',8,1.6,1,e*(L/2-18),MG.base+j*MG.tooth,s*(W/2+.5)));
+  });
+  [-1,1].forEach(e=>{add('w',36,30,W,e*(L/2-18),H-15,0);add('w',36,24,W,e*(L/2-18),12,0);});
+  add('w',L-40,6,W-30,0,3,0);
+  add('w',20,20,W-60,0,H+30,0);[-1,1].forEach(q=>add('w',16,34,16,0,H+12,q*(W/2-40)));
+  const out={};for(const k in parts){out[k]=BGU.mergeBufferGeometries(parts[k],false);parts[k].forEach(g=>g.dispose());}return out;})();
+function magMesh(par,face){const g=new THREE.Group();par.add(g);
+  [['w',M.magW],['c',M.comb]].forEach(([k,mt])=>{const m=new THREE.Mesh(MAGT[k],mt);m.castShadow=true;m.receiveShadow=true;g.add(m);});
+  label(g,'164',70,30,face*(MG.L/2+.5),MG.H-15,0,{bg:'#1b1d20',fg:'#ffffff',pw:180,size:.72,ry:face*PI/2});
+  return g;}
 function buildMagHandler(m,isLoader){
   const L=m.L,x0=-L/2,x1=L/2,z1=m.z1,z0=m.z0,H=1750,s=isLoader?1:-1;
   // magazine bay on the free end (upstream for the loader, downstream for the unloader), shuttle housing towards the line
@@ -155,7 +171,7 @@ function buildMagHandler(m,isLoader){
     const d=new THREE.Mesh(new THREE.PlaneGeometry(206,150),new THREE.MeshBasicMaterial({map:t}));d.position.set(isLoader?bx0-1:bx1+1,H-120,z0+(z1-z0)*(i?0.72:0.28));d.rotation.y=isLoader?-PI/2:PI/2;m.g.add(d);});
   m.plat=new THREE.Group();m.g.add(m.plat);P(m.plat,bx1-bx0-40,20,z1-z0-240,M.ralD,m.magX,-10,(z0+z1)/2);
   m.magZ=[z1-213-225,z1-213-225-450,z1-213-225-900];                                 // 3 magazines side by side (drawing pitch ≈ 450 mm)
-  m.magG=m.magZ.map(z=>{const g=magMesh(m.plat);g.position.set(m.magX,0,z);return g;});
+  m.magG=m.magZ.map(z=>{const g=magMesh(m.plat,isLoader?-1:1);g.position.set(m.magX,0,z);return g;});
   // shuttle housing: cabinet with three hinged top covers (as on the technical drawing)
   const hy=1180;shell(m.g,hx0,hx1,z0,z1,80,hy,M.ral,{noTop:true,left:isLoader?false:LZ,right:isLoader?[LZ[0]]:false});
   const cw=hx1-hx0-20,seg=(z1-z0-20)/3;for(let i=0;i<3;i++)hinged(m,'lid',cw,seg-6,m.shX,hy,z0+10+i*seg,i==2?false:true,M.ral);
@@ -166,16 +182,26 @@ function buildMagHandler(m,isLoader){
   [-1,1].forEach(q=>P(m.g,30,30,z1-z0-120,M.steel,m.shX+q*190,720,(z0+z1)/2));
   m.car=new THREE.Group();m.g.add(m.car);
   rails(m.car,m.shX-250,m.shX+250,0,CONV_Y,{legs:false});P(m.car,440,40,BD+60,M.aluD,m.shX,CONV_Y-80,0);P(m.car,80,170,80,M.dark,m.shX,CONV_Y-180,0);
-  m.cyl=new THREE.Group();m.car.add(m.cyl);
-  cyl(m.cyl,14,14,460,M.alu,m.shX,CONV_Y+70,-BD/2-30,{rz:PI/2});           // pneumatic cylinder alongside the conveyor
-  m.rod=new THREE.Group();m.cyl.add(m.rod);P(m.rod,40,30,40,M.black,0,CONV_Y+70,-BD/2-30);P(m.rod,24,24,BD/2+30,M.steel,0,CONV_Y+70,-BD/4-15);P(m.rod,18,60,16,M.yellow,0,CONV_Y+40,-6);
+  // board mover: a rodless actuator beside the conveyor; its finger runs 13 mm above the board, i.e. through the gap between two boards
+  const zs=isLoader?-(BD/2+48):(BD/2+48),pa=isLoader?[-20,540]:[-540,20];
+  m.reach=isLoader?440:140;
+  P(m.car,pa[1]-pa[0],34,30,M.black,(pa[0]+pa[1])/2,CONV_Y+34,zs);
+  if(!isLoader)P(m.car,pa[1]-pa[0]-20,8,2,M.red,(pa[0]+pa[1])/2,CONV_Y+34,zs-16);
+  m.rod=new THREE.Group();m.car.add(m.rod);
+  P(m.rod,60,46,46,M.dark,m.reach,CONV_Y+34,zs);
+  P(m.rod,20,10,Math.abs(zs),M.aluD,m.reach,CONV_Y+20,zs/2);
+  if(isLoader)cyl(m.rod,7,7,m.reach,M.magW,m.reach/2,CONV_Y+13,0,{rz:PI/2,seg:14});
+  else P(m.rod,m.reach,8,30,M.aluD,m.reach/2,CONV_Y+13,0);
+  m.finger=new THREE.Group();m.rod.add(m.finger);m.finger.position.y=CONV_Y+13;
+  P(m.finger,10,22,60,isLoader?M.magW:M.yellow,0,-8,0);P(m.finger,14,4,64,M.rubber,0,-19,0);
+  m.hook=0;
   m.H=H;
-  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller cylinder':'Pusher cylinder',m.shX,CONV_Y+140,-160],['Hinged covers',m.shX,1240,z1-200]];}
+  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller rod (hooks the far board edge)':'Pusher (belt actuator + finger)',m.shX,CONV_Y+120,isLoader?-160:160],['Hinged covers',m.shX,1240,z1-200]];}
 function magBoardsUpdate(m){const off=m.platY;m.plat.position.y=off;
   m.mags.forEach((mg,i)=>{const g=m.magG[i];g.visible=mg.present;g.position.y=mg.lift||0;
     mg.boards.forEach((b,k)=>{if(b&&b.inMag){b.x=m.X(m.magX);b.z=m.magZ[i];b.dy=off+(mg.lift||0)+MG.base+k*MG.pitch-CONV_Y;}});});
-  m.car.position.z=m.cz;m.rod.position.x=m.rodX;}
-const rodRest=m=>m.shX-150;
+  m.car.position.z=m.cz;m.rod.position.x=m.rodX;m.finger.rotation.z=(m.key==='loader'?1:-1)*(1-m.hook)*1.3;}
+const rodRest=m=>m.key==='loader'?60:m.shX;   // finger rest position (machine-local x)
 const slotPlat=k=>CONV_Y-MG.base-k*MG.pitch;
 function* swapMag(m,i,full){const mg=m.mags[i];mg.busy=true;yield 2.5;m.ops++;
   yield* tw(1.2,k=>mg.lift=k*900);mg.present=false;mg.boards.forEach(b=>b&&killBoard(b));mg.boards=new Array(MG.slots).fill(null);
@@ -185,21 +211,23 @@ function* swapMag(m,i,full){const mg=m.mags[i];mg.busy=true;yield 2.5;m.ops++;
 
 /* 1 ---- LOADER  (triple-magazine line loader, M size) ---- */
 const LOADER=machine({key:'loader',name:'LOADER',full:'Triple-magazine line loader',L:1080,source:true,z1:RAIL_F+380,
-  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Max magazine','355 × 320 × 570 mm, 50 kg each'],['Board out','puller cylinder pulls the board onto a shuttle conveyor that moves sideways to the line'],['Loading time','≈ 18–24 s per board (rear magazine)'],['Pitch','top 5 slots stay empty; shown 20 boards × 20 mm'],['Belt speed','14 m/min'],['Source','manufacturer product page, technical drawing and brochure + your video']],
+  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Max magazine','355 × 320 × 570 mm, 50 kg each'],['Board out','a white puller rod runs through the gap above the board, hooks the far edge and pulls the board onto the shuttle conveyor; the shuttle then moves sideways to the line'],['Loading time','≈ 18–24 s per board (rear magazine)'],['Magazine','open frame with comb slot rails every 10 mm; a board in every 2nd slot (20 mm) leaves a gap for the puller; top 5 positions empty'],['Belt speed','14 m/min'],['Source','manufacturer product page, technical drawing and brochure + your video']],
   build(m){m.z0=m.z1-1750;buildMagHandler(m,true);},
   reset(m){m.mags=[0,1,2].map(()=>({present:true,boards:new Array(MG.slots).fill(null),lift:0,busy:false}));
     m.mags.forEach(mg=>{for(let k=0;k<MG.use;k++){const b=newBoard(0);b.inMag=true;mg.boards[k]=b;}});
-    m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.ops=0;},
+    m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.hook=0;m.ops=0;},
   *run(m){
     while(true){const i=m.mags.findIndex(g=>g.present&&!g.busy&&g.boards.some(b=>b));
       if(i<0){m.state='OPERATOR: LOAD FULL MAGAZINE';yield FRAME;continue;}
       const mg=m.mags[i],k=mg.boards.reduce((a,b,j)=>b?j:a,-1);   // top to bottom
       m.state='SHUTTLE TO MAGAZINE '+(i+1)+' · SLOT '+(k+1);const z0=m.cz,p0=m.platY,p1=slotPlat(k);
       yield* tw(.25+Math.abs(m.magZ[i]-z0)/900,t=>{m.cz=lerp(z0,m.magZ[i],ease(t));m.platY=lerp(p0,p1,ease(t));});
-      m.state='PULLER INTO MAGAZINE';yield* tw(.7,t=>m.rodX=lerp(rodRest(m),m.magX-140,ease(t)));
+      const far=m.magX-BW/2-8;
+      m.state='PULLER INTO MAGAZINE (THROUGH THE GAP)';m.hook=0;yield* tw(1.0,t=>m.rodX=lerp(rodRest(m),far,ease(t)));
+      m.state='HOOK DOWN BEHIND THE BOARD';yield* tw(.3,t=>m.hook=t);
       const b=mg.boards[k];mg.boards[k]=null;b.inMag=false;b.z=m.magZ[i];b.dy=0;const t0=simTime;
-      m.state='PULL BOARD ONTO SHUTTLE';const bx0=m.X(m.magX),bx1=m.X(m.shX);const r0=m.rodX;
-      yield* tw(1.4,t=>{m.rodX=lerp(r0,rodRest(m),t);b.x=lerp(bx0,bx1,t);});
+      m.state='PULL BOARD ONTO SHUTTLE';yield* tw(1.6,t=>{m.rodX=lerp(far,rodRest(m),t);b.x=m.X(m.rodX+BW/2+8);});
+      m.state='HOOK UP';yield* tw(.25,t=>m.hook=1-t);
       if(!mg.boards.some(x=>x))run(swapMag(m,i,true));
       m.state='SHUTTLE TO LINE';const zb=m.cz;yield* tw(.25+Math.abs(LZ[0]-zb)/900,t=>{m.cz=lerp(zb,LZ[0],ease(t));b.z=m.cz;});
       m.state='BOARD OUT';yield* conveyTo(b,m.X(m.L/2-BW/2-10));m.procT.push(simTime-t0);m.busy[0]=true;yield* offer(m,b);m.busy[0]=false;m.done++;}},
@@ -370,26 +398,42 @@ const FIFO=machine({key:'fifo',name:'FIFO BUFFER',full:'Dual-track belt FIFO buf
   specs:[['Size','500 mm long (M), 1700 mm high; single-track model 500 × 1050 × 1700 mm'],['Principle','individual belt segments support each board over its full length; a drive engages the selected segment to move the board in or out'],['Capacity','20 boards per lane at 27 mm pitch'],['Lanes','two stacks side by side, one per lane (as confirmed)'],['Modes','FIFO / LIFO / bypass'],['Source','manufacturer product page + brochure + your photo']],
   build(m){const x0=-250,x1=250,z1=m.z1,z0=LZ[1]-BD/2-7-482;m.z0=z0;feet(m.g,x0,x1,z0,z1);
     shell(m.g,x0,x1,z0,z1,70,1700,M.ral,{noFront:true,left:LZ,right:LZ});
-    P(m.g,x1-x0,1020,12,M.ral,0,560,z1-6);P(m.g,x1-x0,90,12,M.ral,0,1655,z1-6);P(m.g,60,540,12,M.ral,x0+30,1340,z1-6);P(m.g,60,540,12,M.ral,x1-30,1340,z1-6);
-    hinged(m,'door',x1-x0-120,520,0,1600,z1+2,true,M.ral);
-    touch(m.g,0,1000,z1,180,90);handle(m.g,-190,560,z1);estop(m.g,190,1120,z1);P(m.g,180,240,4,M.black,60,560,z1+2);P(m.g,164,224,4,M.white||M.ral2,60,560,z1+4);vents(m.g,-170,100,z1);vents(m.g,170,100,z1,100);
+    P(m.g,x1-x0,1020,12,M.ral,0,560,z1-6);
+    // upper front door with the rounded window (as in your video); hinged at the top, lifts up
+    {const p=new THREE.Group();p.position.set(0,1700,z1+2);m.g.add(p);const w=x1-x0,h=630;
+     const sh=new THREE.Shape();sh.moveTo(-w/2,-h);sh.lineTo(w/2,-h);sh.lineTo(w/2,0);sh.lineTo(-w/2,0);sh.closePath();
+     const rr=60,wx=w/2-55,y0=-h+70,y1=-90,ho=new THREE.Path();ho.moveTo(-wx+rr,y0);ho.lineTo(wx-rr,y0);ho.quadraticCurveTo(wx,y0,wx,y0+rr);ho.lineTo(wx,y1-rr);ho.quadraticCurveTo(wx,y1,wx-rr,y1);
+     ho.lineTo(-wx+rr,y1);ho.quadraticCurveTo(-wx,y1,-wx,y1-rr);ho.lineTo(-wx,y0+rr);ho.quadraticCurveTo(-wx,y0,-wx+rr,y0);sh.holes.push(ho);
+     const pm=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:12,bevelEnabled:false,curveSegments:8}),M.ral);pm.position.z=-12;p.add(pm);
+     const gs=new THREE.Shape(ho.getPoints(8));const gl=new THREE.Mesh(new THREE.ShapeGeometry(gs),M.smoke);gl.position.z=-6;gl.renderOrder=5;p.add(gl);
+     P(p,26,90,16,M.black,-w/2+30,-h/2-40,8);m.hoods.push({p,open:0,target:0,ang:-1.05});}
+    const lamp=new THREE.PointLight(0xe8f0ff,.9,900,1.4);lamp.position.set(0,1350,(z0+z1)/2+150);m.g.add(lamp);
+    touch(m.g,0,1015,z1,190,80);handle(m.g,-190,560,z1);estop(m.g,190,1150,z1);P(m.g,180,240,4,M.black,60,560,z1+2);P(m.g,164,224,4,M.white||M.ral2,60,560,z1+4);vents(m.g,-170,100,z1);vents(m.g,170,100,z1,100);
     fnLabel(m.g,m.name,440,0,860,z1+1);
     m.racks=LZ.map(z=>{const g=new THREE.Group();m.g.add(g);
-      [-1,1].forEach(s=>P(g,440,(NSL-1)*PIT+40,10,M.mag,0,((NSL-1)*PIT)/2,z+s*(BD/2+28)));
-      for(let k=0;k<NSL;k++){[-1,1].forEach(s=>P(g,420,3,10,M.rubber,0,k*PIT-3,z+s*(BD/2-2)));}
-      P(g,440,10,BD+70,M.magD,0,-20,z);return g;});
+      // each belt segment = two narrow belts (front / back edge) over two pulleys, supporting the board over its full length
+      const pr=[],pb=[],pp=[];
+      [-1,1].forEach(s=>{const gg=new THREE.BoxGeometry(440,(NSL-1)*PIT+60,8);gg.translate(0,((NSL-1)*PIT)/2,z+s*(BD/2+30));pr.push(gg);
+        [-1,1].forEach(e=>{const c=new THREE.BoxGeometry(30,(NSL-1)*PIT+60,30);c.translate(e*205,((NSL-1)*PIT)/2,z+s*(BD/2+30));pr.push(c);});});
+      for(let k=0;k<NSL;k++)[-1,1].forEach(s=>{const zc=z+s*(BD/2-4);
+        const b1=new THREE.BoxGeometry(400,2.4,12);b1.translate(0,k*PIT-BT/2-1.2,zc);pb.push(b1);const b2=b1.clone();b2.translate(0,-9,0);pb.push(b2);
+        [-1,1].forEach(e=>{const c=new THREE.CylinderGeometry(5.5,5.5,14,10);c.rotateX(PI/2);c.translate(e*200,k*PIT-BT/2-6,zc);pp.push(c);});
+        const r=new THREE.BoxGeometry(420,4,6);r.translate(0,k*PIT-12,z+s*(BD/2+12));pr.push(r);});
+      [[pr,M.mag],[pb,M.rubber],[pp,M.steel]].forEach(([a,mt])=>{const mm=new THREE.Mesh(BGU.mergeBufferGeometries(a,false),mt);mm.castShadow=true;mm.receiveShadow=true;g.add(mm);a.forEach(q=>q.dispose());});
+      P(g,440,10,BD+80,M.magD,0,-30,z);return g;});
     LZ.forEach(z=>{rails(m.g,x0,x0+40,z,CONV_Y,{legs:false,motor:false});rails(m.g,x1-40,x1,z,CONV_Y,{legs:false,motor:false});});
-    m.drive=LZ.map(z=>P(m.g,40,30,BD,M.dark,-200,CONV_Y-20,z));
+    m.drive=LZ.map(z=>{const d=new THREE.Group();d.position.set(-205,CONV_Y-BT/2-6,z);m.g.add(d);[-1,1].forEach(s=>{const w=cyl(d,16,16,16,M.orange,0,0,s*(BD/2-4),{rx:PI/2,seg:16});});P(d,40,40,BD-30,M.dark,-30,-20,0);return d;});
+    m.drv=[0,0];
     signal(m,x1-50,z0+60,1700);
-    m.tags=[['Lane 1 belt-segment stack',0,1500,LZ[0]],['Lane 2 belt-segment stack',0,1500,LZ[1]],['Segment drive',-200,CONV_Y-60,0]];},
-  reset(m){m.slots=[new Array(NSL).fill(null),new Array(NSL).fill(null)];m.rackY=[CONV_Y,CONV_Y];m.lock=[false,false];m.inB=[false,false];},
+    m.tags=[['Lane 1 belt-segment stack',0,1500,LZ[0]],['Lane 2 belt-segment stack',0,1500,LZ[1]],['Segment drive (engages the belt at the transfer level)',-205,CONV_Y-40,LZ[0]],['Rounded window door — click to open',0,1450,z1]];},
+  reset(m){m.drv=[0,0];m.slots=[new Array(NSL).fill(null),new Array(NSL).fill(null)];m.rackY=[CONV_Y,CONV_Y];m.lock=[false,false];m.inB=[false,false];},
   accepts(l){return !this.inbox[l].length&&!this.inB[l]&&this.slots[l].filter(s=>s).length<NSL;},
   *run(m,l){run(fifoOut(m,l));
     while(true){while(!m.inbox[l].length)yield FRAME;const b=m.inbox[l].shift();m.inB[l]=true;
       while(m.lock[l])yield FRAME;m.lock[l]=true;
       const k=m.slots[l].findIndex(s=>!s);m.state='STORE L'+(l+1)+' → SEGMENT '+(k+1);
-      yield* rackTo(m,l,CONV_Y-k*PIT);yield* conveyTo(b,m.X(0));m.slots[l][k]={b,t:simTime};m.inB[l]=false;m.lock[l]=false;}},
-  update(m){m.racks.forEach((g,l)=>{g.position.y=m.rackY[l];m.slots[l].forEach((s,k)=>{if(s){s.b.x=m.X(0);s.b.z=LZ[l];s.b.dy=m.rackY[l]+k*PIT-CONV_Y;}});});},
+      yield* rackTo(m,l,CONV_Y-k*PIT);m.drv[l]=1;yield* conveyTo(b,m.X(0));m.drv[l]=0;m.slots[l][k]={b,t:simTime};m.inB[l]=false;m.lock[l]=false;}},
+  update(m,dt){m.drive.forEach((d,l)=>{d.position.x=-205+(m.drv[l]?6:0);d.children.forEach(c=>{if(c.geometry.type==='CylinderGeometry')c.rotation.z-=m.drv[l]?dt*12:0;});});m.racks.forEach((g,l)=>{g.position.y=m.rackY[l];m.slots[l].forEach((s,k)=>{if(s){s.b.x=m.X(0);s.b.z=LZ[l];s.b.dy=m.rackY[l]+k*PIT-CONV_Y;}});});},
   rows(m){return[['Lane 1 stored',m.slots[0].filter(s=>s).length+' / '+NSL],['Lane 2 stored',m.slots[1].filter(s=>s).length+' / '+NSL],['Output',fifoGate(m)?'release':'held (downstream busy)']];}
 });
 function fifoGate(m){if(lineMode)return true;return simTime%80<40;}   // single view: downstream "stopped" half the time so the buffer fills and drains
@@ -398,7 +442,7 @@ function* fifoOut(m,l){while(true){
   const occ=m.slots[l].map((s,k)=>s&&{k,t:s.t,b:s.b}).filter(Boolean).sort((a,b)=>a.t-b.t);const n=nextOf(m);
   if(!occ.length||m.lock[l]||!fifoGate(m)||(n&&!n.accepts(l))){yield FRAME;continue;}
   m.lock[l]=true;const o=occ[0];m.state='RELEASE L'+(l+1)+' ← SEGMENT '+(o.k+1);const t0=o.t;
-  yield* rackTo(m,l,CONV_Y-o.k*PIT);m.slots[l][o.k]=null;o.b.dy=0;yield* conveyTo(o.b,m.X(250-BW/2-10));m.lock[l]=false;
+  yield* rackTo(m,l,CONV_Y-o.k*PIT);m.slots[l][o.k]=null;o.b.dy=0;m.drv[l]=1;yield* conveyTo(o.b,m.X(250-BW/2-10));m.drv[l]=0;m.lock[l]=false;
   m.procT.push(simTime-t0);yield* offer(m,o.b);m.done++;}}
 
 /* 8 ---- INVERTER  (X-axis inverter: flips the board about the travel axis) ---- */
@@ -424,11 +468,98 @@ const INVERT=machine({key:'inverter',name:'INVERTER',full:'X-axis board inverter
   rows(m){return[['Boards flipped',String(m.done)]];}
 });
 
-/* 9 ---- UNLOADER  (triple-magazine line unloader, M size) ---- */
+
+/* 9 ---- AOI REVIEW TABLE  (operator verification of AOI calls) ---- */
+M.desk=std(0x1d2024,.6,.1);
+function monitorTex(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return{c,g:c.getContext('2d'),t};}
+const AOITAB=machine({key:'aoitable',name:'AOI TABLE',full:'AOI review table (operator verification)',L:1000,lanesIn:[0,1],z1:RAIL_F+300,
+  specs:[['Function','the operator checks every AOI call and gives the final decision'],['Camera','colour camera with ring light on an X/Y gantry drives to each call position'],['Screens','left: magnified image of the call · right: call list with OK / NG'],['Decision','false call → OK; real defect → NG'],['Good boards','continue to the unloader'],['NG boards','taken out of the conveyor by hand (red NG tray)'],['Source','your video of the AOI table after the AOI']],
+  build(m){const x0=-500,x1=500,z1=m.z1,z0=LZ[1]-BD/2-7-200;m.z0=z0;feet(m.g,x0,x1,z0,z1);
+    shell(m.g,x0,x1,z0,z1,70,1150,M.ral,{noFront:true,noTop:true,left:LZ,right:LZ});
+    P(m.g,x1-x0,CONV_Y-60-70,12,M.ral,0,(CONV_Y-60+70)/2,z1-6);P(m.g,x1-x0,1150-(CONV_Y+230),12,M.ral,0,(1150+CONV_Y+230)/2,z1-6);
+    P(m.g,x1-x0,14,z1-z0,M.ral,0,1143,(z0+z1)/2);P(m.g,x1-x0-40,10,30,M.steel,0,1155,z1-40);
+    hinged(m,'door',x1-x0-40,290,0,CONV_Y+230,z1+2,true,M.ral);
+    handle(m.g,-300,520,z1);vents(m.g,-420,120,z1);fnLabel(m.g,m.name,420,180,620,z1+1);
+    // operator desk with keypad, E-stop, microscope and NG tray
+    const dz=z1+170;P(m.g,x1-x0+260,24,340,M.desk,60,CONV_Y-75,dz);P(m.g,40,CONV_Y-150,40,M.desk,x1+110,(CONV_Y-150)/2+20,dz+110);
+    P(m.g,170,22,110,std(0xf2f2ee,.5),40,CONV_Y-52,dz-40);
+    m.keys=[['OK',0x22b35a],['NG',0xd32b35],['NEXT',0x3a78d6]].map((k,i)=>{const mt=new THREE.MeshStandardMaterial({color:k[1],emissive:k[1],emissiveIntensity:.05,roughness:.4});P(m.g,40,10,40,mt,-10+i*50,CONV_Y-38,dz-40);return mt;});
+    label(m.g,'OK   NG   NEXT',150,22,40,CONV_Y-32.5,dz-6,{rx:-PI/2,fg:'#111',pw:300,size:.6});
+    estop(m.g,240,CONV_Y-60,dz-80);
+    P(m.g,240,90,160,std(0xc8202a,.6,.05),x1+60,CONV_Y-18,dz+40);P(m.g,220,10,140,M.black,x1+60,CONV_Y+23,dz+40);label(m.g,'NG',120,40,x1+60,CONV_Y+29,dz+40,{rx:-PI/2,fg:'#fff',pw:200,size:.7});
+    m.ngTray={x:x1+60,z:dz+40,y:CONV_Y+30};
+    {const a=new THREE.Group();a.position.set(x0+60,CONV_Y-60,dz-60);m.g.add(a);cyl(a,40,46,20,M.black,0,10,0);cyl(a,10,10,260,M.steel,0,140,0);P(a,30,30,260,M.black,0,260,110);
+     const h=new THREE.Group();h.position.set(0,250,230);a.add(h);P(h,80,90,110,M.black,0,0,0);cyl(h,16,20,70,M.black,0,-80,10);[-1,1].forEach(q=>cyl(h,10,10,90,M.black,q*22,40,-40,{rx:-.7}));}
+    // monitors + keyboard on top of the cabinet
+    m.scr=[];[[-215,.12],[235,-.12]].forEach(([x,ry],i)=>{const g=new THREE.Group();g.position.set(x,1150,z1-170);g.rotation.y=ry;m.g.add(g);
+      P(g,140,16,110,M.black,0,8,0);P(g,40,170,30,M.black,0,95,-10);P(g,440,300,30,M.black,0,330,0);
+      const mt=monitorTex(640,430);m.scr.push(mt);const s=new THREE.Mesh(new THREE.PlaneGeometry(412,276),new THREE.MeshBasicMaterial({map:mt.t,toneMapped:false}));s.position.set(0,330,16);g.add(s);});
+    P(m.g,420,16,140,M.black,-40,1158,z1-60);P(m.g,380,10,110,std(0x2c2f34,.6),-60,1168,z1-60);P(m.g,60,24,90,M.black,240,1160,z1-60);
+    // dual-lane conveyor + X/Y camera gantry inside
+    LZ.forEach(z=>rails(m.g,x0,x1,z,CONV_Y,{legs:false}));
+    [z0+70,z1-70].forEach(z=>P(m.g,x1-x0-60,30,30,M.alu,0,CONV_Y+300,z));
+    m.gx=new THREE.Group();m.g.add(m.gx);P(m.gx,40,40,z1-z0-110,M.alu,0,CONV_Y+300,(z0+z1)/2);
+    m.cam=new THREE.Group();m.g.add(m.cam);P(m.cam,90,150,80,M.dark,0,CONV_Y+230,0);cyl(m.cam,22,22,70,M.black,0,CONV_Y+120,0);
+    m.ringM=new THREE.MeshStandardMaterial({color:0x222,emissive:0xffffff,emissiveIntensity:.05});const rg=new THREE.Mesh(new THREE.TorusGeometry(42,7,8,32),m.ringM);rg.rotation.x=PI/2;rg.position.y=CONV_Y+85;m.cam.add(rg);
+    m.spot=new THREE.SpotLight(0xffffff,0,500,.45,.6,1);m.spot.position.set(0,CONV_Y+85,0);const tg=new THREE.Object3D();tg.position.set(0,CONV_Y,0);m.cam.add(tg);m.spot.target=tg;m.cam.add(m.spot);
+    m.fov=new THREE.Mesh(FLAT(40,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));m.fov.position.y=CONV_Y+BT+3;m.cam.add(m.fov);
+    signal(m,x1-60,z0+60,1150);
+    m.tags=[['Camera + ring light on X/Y gantry',0,CONV_Y+330,0],['Left screen: magnified call image',-215,1560,z1-170],['Right screen: AOI call list',235,1560,z1-170],['Decision keypad (OK / NG / NEXT)',40,CONV_Y-20,z1+130],['Stereo microscope',x0+60,CONV_Y+260,z1+400],['NG tray (bad boards taken out by hand)',x1+60,CONV_Y+60,z1+210]];},
+  reset(m){m.cx_=0;m.cz_=0;m.light=0;m.pk=-1;m.cur=null;m.calls=[];m.ci=-1;m.stats={ok:0,ng:0,fc:0,real:0};m.drawn=0;},
+  accepts(l){return !this.inbox[0].length&&!this.inbox[1].length&&!this.busy[0];},
+  *run(m){
+    while(true){while(!m.inbox[0].length&&!m.inbox[1].length){m.state='WAIT FOR BOARD';m.cur=null;yield FRAME;}
+      const l=m.inbox[0].length?0:1,b=m.inbox[l].shift();m.busy[0]=true;const t0=simTime;
+      populate(b);m.state='BOARD IN L'+(l+1);yield* conveyTo(b,m.X(0));m.cur=b;
+      // AOI result for this board: a few calls, most of them false calls
+      const R=Math.random,n=1+Math.floor(R()*3),pl=KIT.places.filter(p=>p.info.kind!=='conn'),real=R()<.18;
+      m.calls=[];for(let i=0;i<n;i++){const p=pl[Math.floor(R()*pl.length)];m.calls.push({p,type:['SHIFT','MISSING','SOLDER','POLARITY','BRIDGE'][Math.floor(R()*5)],real:real&&i===0,res:null});}
+      log('AOI TABLE L'+(l+1)+' #'+b.sn+' · '+n+' AOI call'+(n>1?'s':''),'');
+      for(m.ci=0;m.ci<m.calls.length;m.ci++){const c=m.calls[m.ci];
+        m.state='CAMERA TO CALL '+(m.ci+1)+'/'+n+' · '+c.p.name;const x0=m.cx_,z0=m.cz_,tx=m.X(0)-m.cx+c.p.x,tz=LZ[l]+c.p.z;
+        yield* tw(.6,k=>{m.cx_=lerp(x0,tx,ease(k));m.cz_=lerp(z0,tz,ease(k));});m.light=1;
+        m.state='OPERATOR CHECKS '+c.p.name;yield 1.4;
+        c.res=c.real?'NG':'OK';m.pk=c.real?1:0;c.real?m.stats.real++:m.stats.fc++;yield .35;m.pk=-1;m.light=0;}
+      const ng=m.calls.some(c=>c.res==='NG');m.ci=-1;
+      if(ng){m.stats.ng++;m.state='NG · OPERATOR TAKES THE BOARD OUT';log('AOI TABLE #'+b.sn+' NG → removed by hand','ng');m.hoods[0].target=1;
+        const bx=b.x,bz=b.z;yield* tw(.6,k=>b.dy=lerp(0,140,ease(k)));yield* tw(1.0,k=>{b.x=lerp(bx,m.X(m.ngTray.x),ease(k));b.z=lerp(bz,m.ngTray.z,ease(k));});
+        yield* tw(.5,k=>b.dy=lerp(140,m.ngTray.y-CONV_Y,ease(k)));m.procT.push(simTime-t0);m.done++;m.busy[0]=false;m.cur=null;
+        run((function*(){yield 4;killBoard(b);m.hoods[0].target=hoodsOpen;})());continue;}
+      m.stats.ok++;m.state='GOOD → TO UNLOADER';log('AOI TABLE #'+b.sn+' OK (false calls confirmed)','ok');m.pk=2;yield .3;m.pk=-1;
+      yield* conveyTo(b,m.X(500-BW/2-10));m.procT.push(simTime-t0);yield* offer(m,b);
+      while(b.alive&&b.x<m.x1+BW/2-40)yield FRAME;m.busy[0]=false;m.done++;m.cur=null;}},
+  update(m){m.gx.position.x=m.cx_;m.cam.position.set(m.cx_,0,m.cz_);m.ringM.emissiveIntensity=m.light?2.2:.05;m.spot.intensity=m.light*3;m.fov.material.opacity=m.light*.35;
+    m.keys.forEach((k,i)=>k.emissiveIntensity=m.pk===i?2:.05);
+    if((m.drawn+=1)%6===0)drawAoiScreens(m);},
+  rows(m){return[['Boards checked',String(m.stats.ok+m.stats.ng)],['Good → unloader',String(m.stats.ok)],['NG → taken out',String(m.stats.ng)],['False calls / real defects',m.stats.fc+' / '+m.stats.real]];}
+});
+function populate(b){if(b.pop)return;b.pop=true;const c=KIT.inst(KIT.compsAll);const up=Math.cos(b.flip)>0;
+  if(up)c.position.y=-BT/2;else{c.rotation.x=PI;c.position.y=BT/2;}b.piv.add(c);}
+function drawAoiScreens(m){const [L,R]=m.scr,c=m.ci>=0?m.calls[m.ci]:null;
+  {const g=L.g,W=640,H=430;g.fillStyle='#0b1a12';g.fillRect(0,0,W,H);
+   if(c){g.save();g.beginPath();g.arc(300,215,200,0,7);g.clip();g.fillStyle='#145c34';g.fillRect(0,0,W,H);
+     g.strokeStyle='#1f7a47';g.lineWidth=6;for(let i=0;i<9;i++){g.beginPath();g.moveTo(40+i*60,0);g.lineTo(120+i*40,H);g.stroke();}
+     const k=c.p.info.kind,w=k==='chip'||k==='led'?150:k==='ecap'?190:230,h=k==='chip'||k==='led'?80:k==='ecap'?190:230;
+     g.fillStyle='#d9b85c';[-1,1].forEach(s=>g.fillRect(300+s*(w/2+8)-22,215-h/2-6,44,h+12));
+     g.fillStyle=k==='chip'?'#1d1e20':k==='ecap'?'#c9ced2':'#1a1b1e';g.fillRect(300-w/2,215-h/2,w,h);
+     g.fillStyle='#e8ecef';[-1,1].forEach(s=>g.fillRect(300+s*(w/2)-(s>0?0:16),215-h/2,16,h));
+     g.strokeStyle=c.res==='NG'?'#ff3040':c.res==='OK'?'#30e080':'#ffd400';g.lineWidth=6;g.strokeRect(300-w/2-34,215-h/2-24,w+68,h+48);g.restore();
+     g.strokeStyle='#cfd8dc';g.lineWidth=4;g.beginPath();g.arc(300,215,200,0,7);g.stroke();
+     g.fillStyle='#e9f5ee';g.font='700 26px Arial';g.fillText(c.p.name,520,60);g.font='500 20px Arial';g.fillText(c.type,520,92);
+     g.fillStyle=c.res==='NG'?'#ff5060':c.res==='OK'?'#40e890':'#ffd400';g.font='800 30px Arial';g.fillText(c.res||'CHECK',520,140);}
+   else{g.fillStyle='#5d7a6a';g.font='600 28px Arial';g.fillText(m.cur?'BOARD #'+m.cur.sn:'NO BOARD',40,60);}
+   L.t.needsUpdate=true;}
+  {const g=R.g,W=640,H=430;g.fillStyle='#dfe4ea';g.fillRect(0,0,W,H);g.fillStyle='#2b4a7a';g.fillRect(0,0,W,44);g.fillStyle='#fff';g.font='700 22px Arial';g.fillText('AOI CALLS · REVIEW',14,30);
+   g.fillStyle='#1b1d20';g.font='600 18px Arial';g.fillText(m.cur?'Board #'+m.cur.sn+' · '+(m.cur.code||'no code'):'Waiting for board',14,74);
+   m.calls.forEach((c,i)=>{const y=104+i*44;g.fillStyle=i===m.ci?'#fff3b0':'#ffffff';g.fillRect(14,y-26,W-28,38);g.fillStyle='#1b1d20';g.font='600 18px Consolas,monospace';
+     g.fillText((i+1)+'  '+c.p.name.padEnd(6)+' '+c.type,24,y);g.fillStyle=c.res==='NG'?'#d42030':c.res==='OK'?'#1a9e52':'#8a8f96';g.font='800 18px Arial';g.fillText(c.res||'…',W-90,y);});
+   g.fillStyle='#3b4250';g.font='600 17px Arial';g.fillText('OK '+m.stats.ok+'   NG '+m.stats.ng+'   false calls '+m.stats.fc+'   real '+m.stats.real,14,H-16);R.t.needsUpdate=true;}}
+
+/* 10 ---- UNLOADER  (triple-magazine line unloader, M size) ---- */
 const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line unloader',L:1080,lanesIn:[0,1],sink:true,z1:RAIL_F+380,
-  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','shuttle conveyor lines up with lane 1 or 2, then a pusher cylinder pushes the board into the magazine'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
+  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','the shuttle conveyor lines up with lane 1 or 2, then with the free slot; a belt-driven pusher drops its finger behind the board and pushes it fully into the magazine'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
   build(m){m.z0=m.z1-1750;buildMagHandler(m,false);},
-  reset(m){m.mags=[0,1,2].map(()=>({present:true,boards:new Array(MG.slots).fill(null),lift:0,busy:false}));m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.ops=0;m.stored=0;},
+  reset(m){m.mags=[0,1,2].map(()=>({present:true,boards:new Array(MG.slots).fill(null),lift:0,busy:false}));m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.hook=0;m.ops=0;m.stored=0;},
   accepts(l){return !this.inbox[0].length&&!this.inbox[1].length&&!this.busy[0];},
   *run(m){
     while(true){while(!m.inbox[0].length&&!m.inbox[1].length){m.state='WAIT FOR BOARD';yield FRAME;}
@@ -439,8 +570,10 @@ const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line 
       const mg=m.mags[i];let k=-1;for(let j=MG.use-1;j>=0;j--)if(!mg.boards[j]){k=j;break;}
       m.state='SHUTTLE TO MAGAZINE '+(i+1)+' · SLOT '+(k+1);const zb=m.cz,p0=m.platY;
       yield* tw(.25+Math.abs(m.magZ[i]-zb)/900,t=>{m.cz=lerp(zb,m.magZ[i],ease(t));b.z=m.cz;m.platY=lerp(p0,slotPlat(k),ease(t));});
-      m.state='PUSH BOARD INTO MAGAZINE';const bx0=b.x,bx1=m.X(m.magX);yield* tw(1.3,t=>{m.rodX=lerp(rodRest(m),m.magX-140,t);b.x=lerp(bx0,bx1,t);});
-      b.inMag=true;mg.boards[k]=b;const r1=m.rodX;yield* tw(.5,t=>m.rodX=lerp(r1,rodRest(m),t));
+      const back=m.shX-BW/2-9,end=m.magX-BW/2-4;
+      m.state='PUSHER BEHIND THE BOARD';m.hook=0;yield* tw(.5,t=>m.rodX=lerp(rodRest(m),back,ease(t)));yield* tw(.25,t=>m.hook=t);
+      m.state='PUSH BOARD INTO MAGAZINE SLOT '+(k+1);yield* tw(1.5,t=>{m.rodX=lerp(back,end,t);b.x=m.X(m.rodX+BW/2+5);});
+      b.inMag=true;mg.boards[k]=b;m.state='PUSHER BACK';yield* tw(.25,t=>m.hook=1-t);const r1=m.rodX;yield* tw(.8,t=>m.rodX=lerp(r1,rodRest(m),ease(t)));
       m.stored++;m.outT.push(simTime);m.procT.push(simTime-t0);m.done++;m.busy[0]=false;
       if(mg.boards.slice(0,MG.use).every(x=>x))run(swapMag(m,i,false));}},
   update(m){magBoardsUpdate(m);},
@@ -485,7 +618,7 @@ function stub(x,text){const g=new THREE.Group();scene.add(g);stubs.push(g);box(g
 function start(){clearAll();simTime=0;
   active=lineMode?MACH.slice():[MACH[sel]];
   MACH.forEach(m=>{m.g.visible=lineMode||m===MACH[sel];});active.forEach(m=>m.reset(m));
-  if(!lineMode){const m=MACH[sel];stub(m.x0-m.gap-320,m.i?'FROM '+MACH[m.i-1].name+'  ▶':'BOARD MAGAZINES IN');stub(m.x1+(m.i<8?MACH[m.i+1].gap:0)+320,m.i<8?'▶  TO '+MACH[m.i+1].name:'END OF LINE');
+  if(!lineMode){const m=MACH[sel];stub(m.x0-m.gap-320,m.i?'FROM '+MACH[m.i-1].name+'  ▶':'BOARD MAGAZINES IN');stub(m.x1+(m.i<MACH.length-1?MACH[m.i+1].gap:0)+320,m.i<MACH.length-1?'▶  TO '+MACH[m.i+1].name:'END OF LINE');
     if(!m.source&&!m.noSpawn)run(spawner(m));}
   active.forEach(m=>{if(m.key==='fifo'||m.key==='scanner'||m.key==='inverter')m.lanesIn.forEach(l=>run(m.run(m,l)));else run(m.run(m,0));});
   focus();ui();}
@@ -511,7 +644,7 @@ function selectMachine(i,fly=true){sel=i;document.querySelectorAll('[data-m]').f
   document.querySelectorAll('#flowList span').forEach((s,k)=>s.classList.toggle('me',k===i));
   const m=MACH[i];$('specT').innerHTML=m.specs.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');$('specH').textContent=m.full;
   document.querySelector('#title .t1').textContent=lineMode?'HANDLING LINE':m.name;
-  document.querySelector('#title .t2').textContent=lineMode?'Loader → unloader, nine handling machines connected. Selected: '+m.full+'.':m.full+' — '+m.specs[0][1]+'.';
+  document.querySelector('#title .t2').textContent=lineMode?'Loader → unloader, ten machines connected. Selected: '+m.full+'.':m.full+' — '+m.specs[0][1]+'.';
   document.querySelector('#rail .vtxt').textContent=lineMode?'HANDLING LINE':m.name;
   if(!lineMode)start();else if(fly){const S=Math.max(m.L,1150);flyTo([m.cx+S*.9+1500,2500,4100],[m.cx,950,-150]);}buildTags();ui();}
 function setMode(l){lineMode=l;$('bLine').classList.toggle('on',l);$('bSingle').classList.toggle('on',!l);document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('on',(b.dataset.mode==='line')===l));if(l)start();selectMachine(sel,false);}

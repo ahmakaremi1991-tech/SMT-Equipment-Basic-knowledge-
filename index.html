@@ -83,18 +83,18 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
 </nav>
 
 <div class="flow">
-  <a href="machines/handling_line.html#loader">LOADER</a><i>›</i><a href="machines/handling_line.html#destacker">DESTACKER</a><i>›</i><a href="machines/handling_line.html#laser">LASER</a><i>›</i><a href="machines/handling_line.html#cleaning">CONVEYOR</a><i>›</i><a href="machines/handling_line.html#shuttle">SHUTTLE</a><i>›</i><a href="machines/handling_line.html#scanner">SCANNER</a><i>›</i><a href="machines/handling_line.html#fifo">FIFO</a><i>›</i><a href="machines/handling_line.html#inverter">INVERTER</a><i>›</i><a href="machines/handling_line.html#unloader">UNLOADER</a>
+  <a href="machines/handling_line.html#loader">LOADER</a><i>›</i><a href="machines/handling_line.html#destacker">DESTACKER</a><i>›</i><a href="machines/handling_line.html#laser">LASER</a><i>›</i><a href="machines/handling_line.html#cleaning">CONVEYOR</a><i>›</i><a href="machines/handling_line.html#shuttle">SHUTTLE</a><i>›</i><a href="machines/handling_line.html#scanner">SCANNER</a><i>›</i><a href="machines/handling_line.html#fifo">FIFO</a><i>›</i><a href="machines/handling_line.html#inverter">INVERTER</a><i>›</i><a href="machines/handling_line.html#aoitable">AOI TABLE</a><i>›</i><a href="machines/handling_line.html#unloader">UNLOADER</a>
   <span class="sep"></span>
-  <a href="machines/printer.html">PRINTER</a><i>›</i><a href="machines/spi.html">SPI</a><i>›</i><a href="machines/placement.html">PLACEMENT</a><i>›</i><a href="machines/reflow.html">REFLOW</a><i>›</i><a href="machines/aoi.html">AOI</a>
+  <a href="machines/printer.html">PRINTER</a><i>›</i><a href="machines/spi.html">SPI</a><i>›</i><a href="machines/placement.html">PLACEMENT</a><i>›</i><a href="machines/reflow.html">REFLOW</a><i>›</i><a href="machines/aoi.html">AOI</a><i>›</i><a href="machines/handling_line.html#aoitable">AOI TABLE</a>
 </div>
 
 <section class="guide">
   <div class="g-sum">
     <h2>What this page is</h2>
     <p>A visual introduction to the machines of an SMT production line. Every machine below is an <b>interactive 3D simulation</b> that runs its real process step by step: you see <b>what the machine is for</b>, <b>how it works inside</b> and <b>the numbers that matter</b> (cycle time, accuracy, capacity). Each card also gives the basic knowledge in a few lines, so the page works as a quick reference for training and onboarding.</p>
-    <h2>Machines on this page <span class="cnt">14</span></h2>
+    <h2>Machines on this page <span class="cnt">15</span></h2>
     <ul class="mlist">
-      <li><b>SMT process</b><a href="#printing">Solder paste printer</a><a href="#printing">SPI</a><a href="#placement">Pick-and-place</a><a href="#soldering">Reflow oven</a><a href="#inspection">AOI</a></li>
+      <li><b>SMT process</b><a href="#printing">Solder paste printer</a><a href="#printing">SPI</a><a href="#placement">Pick-and-place</a><a href="#soldering">Reflow oven</a><a href="#inspection">AOI</a><a href="#inspection">AOI table</a></li>
       <li><b>Loading &amp; unloading</b><a href="#loading">Loader</a><a href="#loading">Destacker</a><a href="#loading">Unloader</a></li>
       <li><b>Marking &amp; traceability</b><a href="#marking">Laser marker</a><a href="#marking">Scanner</a></li>
       <li><b>Transport &amp; buffering</b><a href="#transport">Conveyor</a><a href="#transport">Shuttle</a><a href="#transport">FIFO buffer</a><a href="#transport">Inverter</a></li>
@@ -164,7 +164,7 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
 </div>
 
 <h3 id="inspection">Inspection</h3>
-<p class="catnote">The finished joints and components are checked before the board leaves the line.</p>
+<p class="catnote">The finished joints and components are checked by the machine, then the machine's calls are verified by an operator before the board leaves the line.</p>
 <div class="grid">
   <article class="card">
     <a class="pic" href="machines/aoi.html"><img src="img/aoi.jpg" width="800" height="500" loading="lazy" alt="3D automated optical inspection machine"></a>
@@ -173,18 +173,25 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
       <div class="know"><b>BASIC KNOWLEDGE</b>Images under different light angles and colours reveal missing, shifted, tombstoned, reversed or lifted parts and bad fillets. Calls are judged against limits; a "false call" is a good part flagged as bad.</div>
       <div class="tags"><span>20 FOV</span><span>15 MP</span><span>2 lanes</span></div></div>
   </article>
+  <article class="card">
+    <a class="pic" href="machines/handling_line.html#aoitable"><img src="img/aoitable.jpg" width="800" height="500" loading="lazy" alt="AOI review table with two monitors, keypad and microscope"></a>
+    <div class="body"><h2><a href="machines/handling_line.html#aoitable">AOI review table</a></h2>
+      <p>After the AOI an operator checks every call: a camera on an X/Y gantry drives to each call and the magnified image appears on screen.</p>
+      <div class="know"><b>BASIC KNOWLEDGE</b>AOI machines are set strictly, so many calls are false calls. The operator confirms them as OK or marks a real defect as NG. Good boards continue to the unloader; NG boards are taken out by hand for repair.</div>
+      <div class="tags"><span>1–3 calls / board</span><span>OK / NG keypad</span><span>2 lanes</span></div></div>
+  </article>
 </div>
 
 <h3 id="line">Board handling — complete line</h3>
-<p class="catnote">All nine handling machines connected from loader to unloader; switch to any single machine from the bottom bar.</p>
+<p class="catnote">All ten machines connected from loader to unloader; switch to any single machine from the bottom bar.</p>
 <div class="grid">
   <article class="card hero">
     <a class="pic" href="machines/handling_line.html#line"><img src="img/line.jpg" width="800" height="500" alt="Nine board-handling machines connected from loader to unloader"></a>
     <div class="body">
       <h2><a href="machines/handling_line.html#line">Complete handling line</a><span class="badge">WHOLE LINE</span></h2>
-      <p>Nine handling machines connected into one line: boards leave the magazine loader, get a laser-marked 2D code, split onto two lanes, are scanned, buffered, flipped and pushed back into magazines. Live state for every machine and the line output rate. Switch to any single machine from the bottom bar.</p>
+      <p>Ten machines connected into one line: boards leave the magazine loader, get a laser-marked 2D code, split onto two lanes, are scanned, buffered and flipped, checked by an operator at the AOI table and pushed back into magazines. Live state for every machine and the line output rate. Switch to any single machine from the bottom bar.</p>
       <div class="know"><b>BASIC KNOWLEDGE</b>Handling machines do not change the board; they move, buffer, turn and identify it so the process machines never wait. They talk to each other through the SMEMA "board available / machine ready" handshake.</div>
-      <div class="tags"><span>9 machines</span><span>1 → 2 lanes</span><span>~450 boards/h</span><span>950 mm transport</span></div>
+      <div class="tags"><span>10 machines</span><span>1 → 2 lanes</span><span>~450 boards/h</span><span>950 mm transport</span></div>
     </div>
   </article>
 </div>
@@ -196,7 +203,7 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
     <a class="pic" href="machines/handling_line.html#loader"><img src="img/loader.jpg" width="800" height="500" loading="lazy" alt="Triple-magazine line loader"></a>
     <div class="body"><h2><a href="machines/handling_line.html#loader">Triple-magazine line loader</a></h2>
       <p>Three magazines side by side on one lift platform; a shuttle conveyor travels to each one.</p>
-      <div class="know"><b>BASIC KNOWLEDGE</b>The lift indexes the magazine slot to conveyor height, a puller cylinder draws the board onto the shuttle conveyor and the shuttle brings it to the line. With three magazines the operator can swap an empty one without stopping.</div>
+      <div class="know"><b>BASIC KNOWLEDGE</b>Boards sit in comb slots with a gap between them. The lift indexes a slot to conveyor height, a white puller rod runs through the gap, hooks the far edge and pulls the board onto the shuttle conveyor. With three magazines the operator can swap an empty one without stopping.</div>
       <div class="tags"><span>3 magazines</span><span>≈ 18–24 s / board</span><span>1080 × 1750 mm</span></div></div>
   </article>
   <article class="card">
@@ -210,7 +217,7 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
     <a class="pic" href="machines/handling_line.html#unloader"><img src="img/unloader.jpg" width="800" height="500" loading="lazy" alt="Triple-magazine line unloader"></a>
     <div class="body"><h2><a href="machines/handling_line.html#unloader">Triple-magazine line unloader</a></h2>
       <p>Mirror of the loader: the shuttle takes boards from lane 1 or 2 and pushes them into magazines.</p>
-      <div class="know"><b>BASIC KNOWLEDGE</b>The shuttle conveyor lines up with the incoming lane, then with the free magazine slot, and a pusher cylinder pushes the board fully in. Magazines fill top to bottom; good and bad boards can go to different magazines.</div>
+      <div class="know"><b>BASIC KNOWLEDGE</b>The shuttle conveyor lines up with the incoming lane, then with the free slot; a belt-driven pusher drops its finger behind the board and pushes it fully into the magazine. Magazines fill top to bottom; good and bad boards can go to different magazines.</div>
       <div class="tags"><span>3 magazines</span><span>≈ 18–22 s / board</span><span>lane 1 + 2</span></div></div>
   </article>
 </div>
@@ -254,7 +261,7 @@ footer{margin-top:34px;color:var(--mut);font-size:12.5px;border-top:1px solid va
   <article class="card">
     <a class="pic" href="machines/handling_line.html#fifo"><img src="img/fifo.jpg" width="800" height="500" loading="lazy" alt="Dual-track belt FIFO buffer"></a>
     <div class="body"><h2><a href="machines/handling_line.html#fifo">Belt FIFO buffer</a></h2>
-      <p>Two stacks of belt shelves, one per lane, each storing 20 boards.</p>
+      <p>Tall cabinet with a rounded window; inside, two stacks of belt segments, one per lane, each storing 20 boards. In a real line it often sits between the reflow oven and the AOI.</p>
       <div class="know"><b>BASIC KNOWLEDGE</b>A buffer absorbs short stops downstream so upstream machines keep running. FIFO (first in, first out) keeps board order; LIFO and bypass are other modes.</div>
       <div class="tags"><span>20 per lane</span><span>27 mm pitch</span><span>FIFO / LIFO / bypass</span></div></div>
   </article>

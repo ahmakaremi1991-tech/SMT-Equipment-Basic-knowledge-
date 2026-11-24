@@ -63,7 +63,7 @@ def aoi_m(s):
   g.font='700 40px Arial';g.fillStyle='#cfe0ff';g.fillText('AUTOMATED OPTICAL INSPECTION',W/2,222);});
   const m=new THREE.Mesh(new THREE.PlaneGeometry(BX1-BX0,140),std(0xffffff,.45,.1,{map:t}));m.position.set((BX0+BX1)/2,719,750.6);machine.add(m);})();""")
     s=rex(s,STUB_RE,"""/* --- neighbours in the line: reflow oven / buffer upstream, unloader downstream --- */
-[-1,1].forEach(s=>{lineStub(s*1185,0,640,800,s<0?'FROM REFLOW / BUFFER  ▶':'▶  TO UNLOADER');box(scene,4,100,620,M.black,s*864,916,0,NOSH);});
+[-1,1].forEach(s=>{lineStub(s*1185,0,640,800,s<0?'FROM REFLOW / BUFFER  ▶':'▶  TO AOI TABLE');box(scene,4,100,620,M.black,s*864,916,0,NOSH);});
 """)
     return s
 def aoi_r(r):
@@ -210,7 +210,7 @@ RF_CSS="""
 INS_OV=[('title','Machine title',True),('cycle','Cycle time',True),('hud','Status panel',True),('log','Event log',True)]
 BASE={
  'aoi':dict(out='/home/user/smt_aoi.html',title='AOI — automated optical inspection · SMT line simulation',fn='AOI',
-   sub='Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards (pass or NG) leave to the unloader.',
+   sub='Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards go to the AOI review table, where an operator confirms or rejects each call before the unloader.',
    machine=aoi_m,runtime=aoi_r,adapter=AOI_ADAPT,insets=2,stage_ids=['hint','hud','inset','insetR'],ovmap={'hud':'hud','inset':'insets','insetR':'insets','hint':'hint'},
    stage_fix=lambda h:h.replace('<div class="scale"></div>','<div class="scale" data-top="6 mm"></div>'),
    overlays=INS_OV+[('insets','Camera & 3D views',True),('hint','Mouse hint',True)],

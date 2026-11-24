@@ -113,15 +113,15 @@ button{font-family:inherit}
   <button id="themeTgl" title="Switch White / Dark gray theme"><svg viewBox="0 0 24 24" id="themeIco"></svg></button>
   <div class="vtxt">AOI</div></div>
  <div id="sideBody">
-  <div class="fn">AOI</div><div class="fn-sub">Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards (pass or NG) leave to the unloader.</div>
+  <div class="fn">AOI</div><div class="fn-sub">Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards go to the AOI review table, where an operator confirms or rejects each call before the unloader.</div>
   <div class="sec"><h3>Theme</h3><div class="seg2"><button data-theme-btn="light">White</button><button data-theme-btn="dark">Dark gray</button></div></div>
   <div class="sec"><h3>On-screen data</h3><label class="chk"><input type="checkbox" id="ovc-title" data-ovc="title" checked><span>Machine title</span></label><label class="chk"><input type="checkbox" id="ovc-cycle" data-ovc="cycle" checked><span>Cycle time</span></label><label class="chk"><input type="checkbox" id="ovc-hud" data-ovc="hud" checked><span>Status panel</span></label><label class="chk"><input type="checkbox" id="ovc-log" data-ovc="log" checked><span>Event log</span></label><label class="chk"><input type="checkbox" id="ovc-insets" data-ovc="insets" checked><span>Camera & 3D views</span></label><label class="chk"><input type="checkbox" id="ovc-hint" data-ovc="hint" checked><span>Mouse hint</span></label></div>
   
   <div class="sec"><h3>Machine</h3><table class="spec"><tr><td>Footprint</td><td>1250 × 1500 × 1600 mm</td></tr><tr><td>Lanes</td><td>2 (one optical head)</td></tr><tr><td>PCB, dual lane</td><td>50 × 50 – 330 × 280 mm</td></tr><tr><td>Top camera</td><td>15 MP, telecentric</td></tr><tr><td>FOV</td><td>58.56 × 58.56 mm at 15 µm</td></tr><tr><td>Side cameras</td><td>4 angled</td></tr><tr><td>3D</td><td>Multi-frequency moiré</td></tr><tr><td>Drive</td><td>Linear motor XY</td></tr><tr><td>Demo board</td><td>250 × 200 mm, 20 FOV</td></tr></table><p class="note">Generic machine model. Dimensions follow published data for this machine class; units are millimetres, conveyor height 900 mm, boards flow left to right.</p></div>
-  <div class="sec"><h3>Position in the SMT line</h3><div class="flow"><span class="">LOADER</span><i>›</i><span class="">PRINTER</span><i>›</i><span class="">SPI</span><i>›</i><span class="">PLACEMENT</span><i>›</i><span class="">REFLOW</span><i>›</i><span class="me">AOI</span><i>›</i><span class="">UNLOADER</span></div></div>
+  <div class="sec"><h3>Position in the SMT line</h3><div class="flow" id="flowList"><span class="">LOADER</span><i>›</i><span class="">PRINTER</span><i>›</i><span class="">SPI</span><i>›</i><span class="">PLACEMENT</span><i>›</i><span class="">REFLOW</span><i>›</i><span class="me">AOI</span><i>›</i><span class="">UNLOADER</span></div></div>
  </div></aside>
 <main id="stage"><canvas id="c"></canvas>
-<div id="title" class="panel" data-ov="title"><div class="t1">AOI</div><div class="t2">Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards (pass or NG) leave to the unloader.</div></div>
+<div id="title" class="panel" data-ov="title"><div class="t1">AOI</div><div class="t2">Dual-lane 2D/3D automated optical inspection. Reflowed boards arrive from the reflow oven / buffer; inspected boards go to the AOI review table, where an operator confirms or rejects each call before the unloader.</div></div>
 <div id="cycle" class="panel" data-ov="cycle"><div class="k" id="cyK">CYCLE TIME</div><div class="v" id="cyV">—</div><div class="s" id="cyS"></div></div>
 <div id="hint" data-ov="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click the hood or the cabinet doors to open them</div>
 <div id="hud" data-ov="hud" class="panel">
@@ -2684,7 +2684,7 @@ let monTex,monCtx;
 })();
 
 /* --- neighbours in the line: reflow oven / buffer upstream, unloader downstream --- */
-[-1,1].forEach(s=>{lineStub(s*1185,0,640,800,s<0?'FROM REFLOW / BUFFER  ▶':'▶  TO UNLOADER');box(scene,4,100,620,M.black,s*864,916,0,NOSH);});
+[-1,1].forEach(s=>{lineStub(s*1185,0,640,800,s<0?'FROM REFLOW / BUFFER  ▶':'▶  TO AOI TABLE');box(scene,4,100,620,M.black,s*864,916,0,NOSH);});
 
 /* --- interior: bed, lighting --- */
 const interior=new THREE.Group();machine.add(interior);
