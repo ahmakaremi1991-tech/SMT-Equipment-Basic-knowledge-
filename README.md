@@ -1,6 +1,6 @@
 # SMT Equipment – Basic Knowledge
 
-**Online:** https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/ (catalogue) · [Handling line](https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/machines/handling_line.html#line)
+**Online:** https://ahmakaremi1991-tech.github.io/SMT-Equipment-Basic-knowledge-/ (catalogue) · [Handling line](https://ahmakaremi1991-tech.github.io/SMT-Equipment-Basic-knowledge-/machines/handling_line.html#line)
 
 Open `index.html` for the categorised catalogue of all machines.
 

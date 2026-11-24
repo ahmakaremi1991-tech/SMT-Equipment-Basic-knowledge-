@@ -1,7 +1,7 @@
 # How to continue this project
 
 ## Open it online
-- Catalogue: https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/
+- Catalogue: https://ahmakaremi1991-tech.github.io/SMT-Equipment-Basic-knowledge-/
 - Any page: `…/machines/<name>.html`, for example `…/machines/handling_line.html#line`
 - The AOI sorting line moved to its own repository, `SMT-AOI-sorting-line`
 
