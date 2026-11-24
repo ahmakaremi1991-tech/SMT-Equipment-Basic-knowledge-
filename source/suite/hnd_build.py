@@ -21,7 +21,7 @@ css="""#hud{width:330px}
 .lrow{cursor:pointer;border-radius:6px;padding:3px 5px;margin:0 -5px}.lrow:hover{background:var(--btn)}.lrow.sel{background:var(--btnh)}
 .lrow .pill{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #flowList span{cursor:pointer}"""
-js="<script>\n'use strict';\nwindow.SMT_CFG={shadow:1700,shadowFar:16000,shadowMap:4096,maxDist:26000,esd:10600,contact:[11000,2800]};\n"+rd(os.path.join(D,'common.js')).replace("'use strict';\n","",1)+rd(os.path.join(D,'pcbkit.js'))+rd(os.path.join(D,'hnd2.js'))+"\n</script>"
+js="<script>\n'use strict';\nwindow.SMT_CFG={shadow:1700,shadowFar:16000,shadowMap:4096,maxDist:26000,esd:10600,contact:[11000,2800]};\n"+rd(os.path.join(D,'common.js')).replace("'use strict';\n","",1)+rd(os.path.join(D,'pcbkit.js'))+rd(os.path.join(D,'handling_parts.js'))+rd(os.path.join(D,'hnd2.js'))+"\n</script>"
 html=page(dict(title='BOARD HANDLING LINE — loader to unloader · SMT line simulation',fn='HANDLING LINE',
   sub='Bare-board handling line: loader, destacker, laser marker, conveyor, shuttle, scanner, FIFO buffer, inverter, AOI review table and unloader, modelled on manufacturer data. Switch between machines or run the whole line.',
   overlays=[('title','Machine title',True),('cycle','Cycle time',True),('hud','Status panel',True),('log','Event log',True),('hint','Mouse hint',True)],
