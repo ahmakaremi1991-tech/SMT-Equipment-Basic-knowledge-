@@ -44,7 +44,7 @@ Machine models are **brand-free** on purpose: the repository is public, so no ma
     - Unloader: fills the magazine top → bottom. The pusher waits *behind* the panel at its reference point. The conveyor carries the panel to the end sensor, then the pusher pushes it into the magazine and returns to reference.
     - Loader: the reverse. It unloads bottom → top, the puller rod goes *under* the panel, and the finger flips up behind the far edge and pulls the panel out.
 
-### 2026-11-24 — AOI sorting line (`machines/sorting_line.html`)
+### 2026-11-24 — AOI sorting line (moved to its own repository `SMT-AOI-sorting-line` the same day)
 17. The owner provided a brief for an offline AOI sorting line simulator. Agreed decisions:
     - The page is in **3D** and reuses the machine models. It is a **single lane** (lane 1).
     - Line: Loader → Flipper 1 → Scanner → AOI → Flipper 2 → Unloader.

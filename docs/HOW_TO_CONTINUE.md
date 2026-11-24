@@ -2,7 +2,8 @@
 
 ## Open it online
 - Catalogue: https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/
-- Any page: `…/machines/<name>.html`, for example `…/machines/sorting_line.html`
+- Any page: `…/machines/<name>.html`, for example `…/machines/handling_line.html#line`
+- The AOI sorting line moved to its own repository, `SMT-AOI-sorting-line`
 
 If the links return 404, turn on GitHub Pages: repository **Settings → Pages → Branch `main`, folder `/ (root)`**.
 
@@ -26,15 +27,14 @@ Requirements:
 | Page | Command | Main sources |
 |---|---|---|
 | Handling line | `python3 source/suite/hnd_build.py` | `common.js`, `pcbkit.js`, `handling_parts.js`, `hnd2.js` |
-| AOI sorting line | `python3 source/suite/sort_build.py` | the files above, `src/aoi.machine.js` (wrapped as `buildAOI`), and `sort.js` |
 | Printer / SPI / Reflow / AOI | `python3 source/suite/build4.py printer` (or `spi`, `reflow`, `aoi`) | `src/<page>.*.js` |
 | Placement | `python3 source/suite/npm.py` | `npm.entry.js`, `mach2.js` |
 
 `page.py`, `shell.css` and `shell.js` make up the shared page shell (theme, side panel, overlays, cycle-time badge).
 
 ## Test headless
-The scripts in `source/suite/tests/` use the pre-installed Playwright Chromium with SwiftShader. Each page exposes `window.__sim` (`ff(seconds)` to fast-forward, plus `start`, `markPanel`, `decide`, `replaceMags`, `views`, …). Example:
+The scripts in `source/suite/tests/` use the pre-installed Playwright Chromium with SwiftShader. Each page exposes `window.__sim` (`ff(seconds)` to fast-forward, `views`, `setHoods`, …). Example:
 ```
-node source/suite/tests/check_sort.js "a|__sim.start()|60"
+node source/suite/tests/check_hnd.js "a|selectMachine(0)|30"
 ```
 Screenshots are written to `out/`, which is git-ignored.

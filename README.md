@@ -1,8 +1,10 @@
 # SMT Equipment – Basic Knowledge
 
-**Online:** https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/ (catalogue) · [AOI sorting line](https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/machines/sorting_line.html) · [Handling line](https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/machines/handling_line.html#line)
+**Online:** https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/ (catalogue) · [Handling line](https://ahmakaremi1991-tech.github.io/smt-equipment-basic-knowledge-/machines/handling_line.html#line)
 
 Open `index.html` for the categorised catalogue of all machines.
+
+The **AOI sorting line** simulator now has its own repository: https://github.com/ahmakaremi1991-tech/SMT-AOI-sorting-line (site: https://ahmakaremi1991-tech.github.io/SMT-AOI-sorting-line/).
 
 Project history and decisions: [`docs/PROJECT_HISTORY.md`](docs/PROJECT_HISTORY.md) · how to rebuild, test and continue: [`docs/HOW_TO_CONTINUE.md`](docs/HOW_TO_CONTINUE.md)
 
@@ -10,7 +12,6 @@ Interactive 3D simulations of an SMT production line, one self-contained HTML fi
 
 | File | Machine |
 |---|---|
-| `machines/sorting_line.html` | AOI sorting line simulator: loader → flipper → scanner → AOI → flipper → unloader, optional line setup, operator judgement (PASS/FAIL), good / defect magazines, EN / RO. |
 | `machines/handling_line.html` | Board handling line: loader, destacker, laser marker, conveyor, shuttle, scanner, FIFO buffer, inverter, AOI review table, unloader. Single-machine view or whole line connected. |
 | `machines/printer.html` | Solder paste stencil printer |
 | `machines/spi.html` | 3D solder paste inspection (dual lane) |
