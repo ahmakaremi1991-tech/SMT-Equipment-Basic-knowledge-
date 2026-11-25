@@ -127,7 +127,7 @@ button{font-family:inherit}
 <div id="title" class="panel" data-ov="title"><div class="t1">HANDLING LINE</div><div class="t2">Bare-board handling line: loader, destacker, laser marker, conveyor, shuttle, scanner, FIFO buffer, inverter, AOI review table and unloader, modelled on manufacturer data. Switch between machines or run the whole line.</div></div>
 <div id="cycle" class="panel" data-ov="cycle"><div class="k" id="cyK">CYCLE TIME</div><div class="v" id="cyV">—</div><div class="s" id="cyS"></div></div>
 <div id="hint" data-ov="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click a glass hood to open it</div><div id="hud" class="panel" data-ov="hud"><h2>STATUS</h2><div id="hudBody"></div><div id="log" data-ov="log"></div></div>
-<div id="bar" class="panel"><span class="lbl">Equipment</span><button data-m="0" class=on>1 Loader</button><button data-m="1">2 Destack</button><button data-m="2">3 Laser</button><button data-m="3">4 Conveyor</button><button data-m="4">5 Shuttle</button><button data-m="5">6 Scan</button><button data-m="6">7 FIFO</button><button data-m="7">8 Invert</button><button data-m="8">9 AOI table</button><button data-m="9">10 Unload</button><div class="sep"></div><button id="bSingle" class="on">Single machine</button><button id="bLine">Whole line</button><div class="sep"></div><button id="bHood">Open covers</button><button id="bXray">X-ray</button><button id="bLab">Labels</button><div class="sep"></div><button data-v="over" class="on">Overview</button><button data-v="inside">Inside</button><button data-v="follow">Follow board</button><button data-v="top">Top</button><div class="sep"></div><button id="bPause">Pause</button><button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="4">4×</button></div>
+<div id="bar" class="panel"><span class="lbl">Equipment</span><button data-m="0" class=on>1 Loader</button><button data-m="1">2 Destack</button><button data-m="2">3 Laser</button><button data-m="3">4 Conveyor</button><button data-m="4">5 Shuttle</button><button data-m="5">6 Scan</button><button data-m="6">7 FIFO</button><button data-m="7">8 Invert</button><button data-m="8">9 AOI table</button><button data-m="9">10 Unload</button><div class="sep"></div><button id="bSingle" class="on">Single machine</button><button id="bLine">Whole line</button><div class="sep"></div><button id="bHood">Open covers</button><button id="bXray">X-ray</button><button id="bLab">Labels</button><div class="sep"></div><button data-v="over" class="on">Overview</button><button data-v="inside">Inside</button><button data-v="follow">Follow board</button><button data-v="top">Top</button><button data-v="pusher">Unloader pusher</button><div class="sep"></div><button id="bPause">Pause</button><button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="4">4×</button></div>
 <div id="tags"></div>
 </main>
 <script>/* ===== SMT line suite — shared shell logic (theme, side panel, overlays, cycle time) ===== */
@@ -2949,28 +2949,34 @@ function buildMagHandler(m,isLoader){
   m.car=new THREE.Group();m.g.add(m.car);
   rails(m.car,m.shX-250,m.shX+250,0,CONV_Y,{legs:false});P(m.car,440,40,BD+60,M.aluD,m.shX,CONV_Y-80,0);P(m.car,80,170,80,M.dark,m.shX,CONV_Y-180,0);
   // board mover: a rodless actuator beside the conveyor; its finger runs 13 mm above the board, i.e. through the gap between two boards
-  const zs=isLoader?-(BD/2+48):(BD/2+48),pa=isLoader?[-20,540]:[-540,20];
-  m.reach=isLoader?440:140;
+  const zs=isLoader?-(BD/2+48):(BD/2+48),entry=m.magX-MG.L/2,pa=isLoader?[-20,540]:[m.shX-340,entry-8];
+  m.reach=isLoader?440:150;
   P(m.car,pa[1]-pa[0],34,30,M.black,(pa[0]+pa[1])/2,CONV_Y+34,zs);
-  if(!isLoader)P(m.car,pa[1]-pa[0]-20,8,2,M.red,(pa[0]+pa[1])/2,CONV_Y+34,zs-16);
+  if(!isLoader)P(m.car,pa[1]-pa[0]-20,8,2,M.red,(pa[0]+pa[1])/2,CONV_Y+34,zs-16);   // red drive belt of the linear actuator
   m.rod=new THREE.Group();m.car.add(m.rod);
-  P(m.rod,60,46,46,M.dark,m.reach,CONV_Y+34,zs);
+  if(isLoader)P(m.rod,60,46,46,M.dark,m.reach,CONV_Y+34,zs);
+  else P(m.rod,60,46,46,M.dark,-m.reach,CONV_Y+34,zs);                               // carriage on the actuator, behind the finger
   if(isLoader){P(m.rod,20,10,Math.abs(zs),M.aluD,m.reach,CONV_Y-58,zs/2);P(m.rod,20,48,20,M.aluD,m.reach,CONV_Y-36,0);
     cyl(m.rod,7,7,m.reach,M.magW,m.reach/2,CONV_Y-13,0,{rz:PI/2,seg:14});}                 // white puller rod runs UNDER the panel
-  else{P(m.rod,20,10,Math.abs(zs),M.aluD,m.reach,CONV_Y+20,zs/2);P(m.rod,m.reach,8,30,M.aluD,m.reach/2,CONV_Y+13,0);}
-  m.finger=new THREE.Group();m.rod.add(m.finger);m.finger.position.y=isLoader?CONV_Y-13:CONV_Y+13;
-  if(isLoader){P(m.finger,10,22,60,M.magW,0,8,0);P(m.finger,14,4,64,M.rubber,0,19,0);}       // finger flips UP behind the far edge
-  else{P(m.finger,10,22,60,M.yellow,0,-8,0);P(m.finger,14,4,64,M.rubber,0,-19,0);}
+  m.finger=new THREE.Group();m.rod.add(m.finger);
+  if(isLoader){m.finger.position.y=CONV_Y-13;P(m.finger,10,22,60,M.magW,0,8,0);P(m.finger,14,4,64,M.rubber,0,19,0);}       // finger flips UP behind the far edge
+  else{// unloader: black lever pivoting on the carriage, pointing downstream; its tip carries a paddle that drops behind the panel's trailing edge
+    const L=m.reach,zi=-BD/4,fz=BD/2-12;m.finger.position.set(-L,CONV_Y+34,0);
+    P(m.finger,L+10,16,18,M.black,L/2,0,zs);                                       // lever arm beside the conveyor
+    P(m.finger,16,14,zs-zi+9,M.black,L-8,-6,(zs+zi)/2);                             // cross bar over the front rail (above it)
+    P(m.finger,8,26,fz-zi,M.yellow,L-4,-21,(fz+zi)/2);                              // paddle between the rails, down to the panel
+    P(m.finger,3,24,fz-zi-4,M.rubber,L,-21,(fz+zi)/2);}                             // rubber pad that touches the panel edge
   m.sensor=new THREE.MeshStandardMaterial({color:0x553300,emissive:0xff9a20,emissiveIntensity:.05});
   P(m.car,16,16,16,m.sensor,isLoader?m.shX-250+8:m.shX+250-8,CONV_Y+22,-(BD/2+18));       // end-of-conveyor sensor
   m.hook=0;
   m.H=H;
-  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller rod (under the panel, finger up)':'Pusher (belt actuator + finger)',m.shX,CONV_Y+120,isLoader?-160:160],['Hinged covers',m.shX,1240,z1-200]];}
+  if(!isLoader)m.seatX=entry+1+BW/2;                                               // stored panel: trailing edge just inside the magazine entrance
+  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller rod (under the panel, finger up)':'Pusher: lever on a belt actuator, stops at the magazine entrance',m.shX,CONV_Y+120,isLoader?-160:160],['Hinged covers',m.shX,1240,z1-200]];}
 function magBoardsUpdate(m){const off=m.platY;m.plat.position.y=off;
   m.mags.forEach((mg,i)=>{const g=m.magG[i];g.visible=mg.present;g.position.y=mg.lift||0;
-    mg.boards.forEach((b,k)=>{if(b&&b.inMag){b.x=m.X(m.magX);b.z=m.magZ[i];b.dy=off+(mg.lift||0)+MG.base+k*MG.pitch-CONV_Y;}});});
-  m.car.position.z=m.cz;m.rod.position.x=m.rodX;if(m.sensor)m.sensor.emissiveIntensity=m.sens?2.5:.05;m.finger.rotation.z=(m.key==='loader'?1:-1)*(1-m.hook)*1.3;}
-const rodRest=m=>m.key==='loader'?60:m.shX-140;   // finger reference position (machine-local x)
+    mg.boards.forEach((b,k)=>{if(b&&b.inMag){b.x=m.X(m.seatX??m.magX);b.z=m.magZ[i];b.dy=off+(mg.lift||0)+MG.base+k*MG.pitch-CONV_Y;}});});
+  m.car.position.z=m.cz;m.rod.position.x=m.rodX;if(m.sensor)m.sensor.emissiveIntensity=m.sens?2.5:.05;m.finger.rotation.z=m.key==='loader'?(1-m.hook)*1.3:(1-m.hook)*.42;}
+const rodRest=m=>m.key==='loader'?60:m.shX-150;   // finger reference position (machine-local x); unloader: paddle behind the panel at the end sensor
 const slotPlat=k=>CONV_Y-MG.base-k*MG.pitch;
 function* swapMag(m,i,full){const mg=m.mags[i];mg.busy=true;yield 2.5;m.ops++;
   yield* tw(1.2,k=>mg.lift=k*900);mg.present=false;mg.boards.forEach(b=>b&&killBoard(b));mg.boards=new Array(MG.slots).fill(null);
@@ -3330,7 +3336,7 @@ function drawAoiScreens(m){const [L,R]=m.scr,c=m.ci>=0?m.calls[m.ci]:null;
 
 /* 10 ---- UNLOADER  (triple-magazine line unloader, M size) ---- */
 const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line unloader',L:1080,lanesIn:[0,1],sink:true,z1:RAIL_F+380,
-  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','the shuttle conveyor lines up with lane 1 or 2, the conveyor carries the panel to the end sensor while the pusher waits behind at its reference point; the shuttle lines up with the free slot, the pusher pushes the panel fully into the magazine and returns to reference'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
+  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','the shuttle conveyor lines up with lane 1 or 2 and carries the panel to the end sensor; the shuttle lines up with the free slot and the belts drive the panel into the magazine as far as they reach. The pusher (a black lever on a belt actuator) then drops behind the panel, pushes it home and stops at the magazine entrance — it never goes into the magazine — then lifts and returns to its reference point'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
   build(m){m.z0=m.z1-1750;buildMagHandler(m,false);},
   reset(m){m.mags=[0,1,2].map(()=>({present:true,boards:new Array(MG.slots).fill(null),lift:0,busy:false}));m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.hook=0;m.sens=0;m.ops=0;m.stored=0;},
   accepts(l){return !this.inbox[0].length&&!this.inbox[1].length&&!this.busy[0];},
@@ -3343,11 +3349,12 @@ const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line 
       const mg=m.mags[i];let k=-1;for(let j=MG.use-1;j>=0;j--)if(!mg.boards[j]){k=j;break;}
       m.state='SHUTTLE TO MAGAZINE '+(i+1)+' · SLOT '+(k+1);const zb=m.cz,p0=m.platY;
       yield* tw(.25+Math.abs(m.magZ[i]-zb)/900,t=>{m.cz=lerp(zb,m.magZ[i],ease(t));b.z=m.cz;m.platY=lerp(p0,slotPlat(k),ease(t));});
-      const ref=rodRest(m),edge=b.x-m.cx-BW/2-5,end=m.magX-BW/2-4;
-      m.state='PUSHER DOWN AT REFERENCE';yield* tw(.25,t=>m.hook=t);
-      m.state='PUSHER TO PANEL EDGE';yield* tw(.6,t=>m.rodX=lerp(ref,edge,t));m.sens=0;
-      m.state='PUSH PANEL INTO MAGAZINE SLOT '+(k+1);yield* tw(1.4,t=>{m.rodX=lerp(edge,end,t);b.x=m.X(m.rodX+BW/2+5);});
-      b.inMag=true;mg.boards[k]=b;m.state='END SENSOR → PUSHER BACK TO REFERENCE';yield* tw(.25,t=>m.hook=1-t);const r1=m.rodX;yield* tw(.9,t=>m.rodX=lerp(r1,ref,ease(t)));
+      const ref=rodRest(m),home=m.magX-MG.L/2-2;
+      m.state='BELT FEEDS PANEL INTO MAGAZINE SLOT '+(k+1);yield* conveyTo(b,m.X(m.shX+250-8+BW/2));m.sens=0;
+      m.state='PUSHER LEVER DOWN BEHIND THE PANEL';yield* tw(.25,t=>m.hook=t);
+      const edge=b.x-m.cx-BW/2-3;m.state='PUSHER TO PANEL EDGE';yield* tw(.8,t=>m.rodX=lerp(ref,edge,ease(t)));
+      m.state='PUSH PANEL HOME (PUSHER STOPS AT MAGAZINE ENTRANCE)';yield* tw(.7,t=>{m.rodX=lerp(edge,home,t);b.x=m.X(m.rodX+BW/2+3);});
+      b.inMag=true;mg.boards[k]=b;m.state='PUSHER UP → BACK TO REFERENCE';yield* tw(.25,t=>m.hook=1-t);yield* tw(.9,t=>m.rodX=lerp(home,ref,ease(t)));
       m.stored++;m.outT.push(simTime);m.procT.push(simTime-t0);m.done++;m.busy[0]=false;
       if(mg.boards.slice(0,MG.use).every(x=>x))run(swapMag(m,i,false));}},
   update(m){magBoardsUpdate(m);},
@@ -3409,6 +3416,7 @@ const views={over:focus,
   follow:()=>{const m=MACH[sel];setHoods(1);const b=boards.filter(b=>b.alive&&b.x>m.x0-300&&b.x<m.x1+300&&Math.abs(b.dy)<5).sort((a,c)=>c.x-a.x)[0]||boards.filter(b=>b.alive&&Math.abs(b.dy)<5)[0];
     if(!b)return;flyTo([b.x-350,CONV_Y+420,b.z+700],[b.x,CONV_Y,b.z],.9);follow={b};},
   line:()=>{flyTo([0,6200,11800],[0,700,0]);},
+  pusher:()=>{if(!lineMode&&MACH[sel]!==UNLOAD)selectMachine(MACH.indexOf(UNLOAD),false);const m=UNLOAD;setHoods(0);if(!xray)$('bXray').click();const x=m.X(-40);flyTo([x-40,CONV_Y+1650,m.cz+330],[x,CONV_Y,m.cz-30]);follow={pusher:true};},
   top:()=>{const m=MACH[sel];setHoods(1);flyTo(lineMode?[0,13000,10]:[m.cx,3600+m.L,10],[lineMode?0:m.cx,900,0]);}};
 let hoodsOpen=0;
 function setHoods(o){hoodsOpen=o;MACH.forEach(m=>m.hoods.forEach(h=>h.target=o));$('bHood').textContent=o?'Close covers':'Open covers';$('bHood').classList.toggle('on',!!o);}
@@ -3476,7 +3484,8 @@ function frame(){
     if(m.lamps){const run=!paused&&!/WAIT|IDLE/.test(m.state),warn=/OPERATOR|CHANGE|HELD/.test(m.state);m.lamps.g.emissiveIntensity=run?1.8:.05;m.lamps.y.emissiveIntensity=warn||paused?1.8:.05;m.lamps.r.emissiveIntensity=.05;}});
   boards.forEach(b=>{if(!b.alive)return;b.g.position.set(b.x,CONV_Y+BT/2+b.dy,b.z);b.piv.rotation.x=b.flip;});
   if(tween){tween.t+=rdt;const k=ease(Math.min(1,tween.t/tween.dur));camera.position.lerpVectors(tween.p0,tween.p1,k);controls.target.lerpVectors(tween.t0,tween.t1,k);if(k>=1)tween=null;}
-  if(follow&&!tween){if(!follow.b.alive)follow=null;else{_p.set(follow.b.x,CONV_Y,follow.b.z).sub(controls.target);camera.position.add(_p);controls.target.add(_p);}}
+  if(follow&&follow.pusher&&!tween){_p.set(UNLOAD.X(-40),CONV_Y,UNLOAD.cz-30).sub(controls.target);_p.x=0;camera.position.add(_p);controls.target.add(_p);}
+  else if(follow&&!tween){if(!follow.b.alive)follow=null;else{_p.set(follow.b.x,CONV_Y,follow.b.z).sub(controls.target);camera.position.add(_p);controls.target.add(_p);}}
   controls.update();const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(1.5,Math.min(10,dist*.03));camera.updateProjectionMatrix();
   const [W,H]=SMT.size();renderer.setViewport(0,0,W,H);renderer.clear();renderer.shadowMap.needsUpdate=true;renderer.render(scene,camera);
   if(showTags)tags.forEach(t=>{_p.copy(t.v);if(t.m)t.m.g.localToWorld(_p);_p.project(camera);const vis=t.m.g.visible&&_p.z<1&&Math.abs(_p.x)<1&&Math.abs(_p.y)<1;t.el.style.display=vis?'block':'none';if(vis){t.el.style.left=((_p.x+1)/2*W)+'px';t.el.style.top=((1-_p.y)/2*H)+'px';}});

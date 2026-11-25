@@ -9,7 +9,7 @@ SHORT=['1 Loader','2 Destack','3 Laser','4 Conveyor','5 Shuttle','6 Scan','7 FIF
 bar=('<span class="lbl">Equipment</span>'+''.join(f'<button data-m="{i}"{" class=on" if i==0 else ""}>{s}</button>' for i,s in enumerate(SHORT))+
  '<div class="sep"></div><button id="bSingle" class="on">Single machine</button><button id="bLine">Whole line</button>'
  '<div class="sep"></div><button id="bHood">Open covers</button><button id="bXray">X-ray</button><button id="bLab">Labels</button>'
- '<div class="sep"></div><button data-v="over" class="on">Overview</button><button data-v="inside">Inside</button><button data-v="follow">Follow board</button><button data-v="top">Top</button>'
+ '<div class="sep"></div><button data-v="over" class="on">Overview</button><button data-v="inside">Inside</button><button data-v="follow">Follow board</button><button data-v="top">Top</button><button data-v="pusher">Unloader pusher</button>'
  '<div class="sep"></div><button id="bPause">Pause</button><button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="4">4×</button>')
 stage=('<div id="hint" data-ov="hint">Drag = rotate · Wheel = zoom · Right-drag = pan · Click a glass hood to open it</div>'
  '<div id="hud" class="panel" data-ov="hud"><h2>STATUS</h2><div id="hudBody"></div><div id="log" data-ov="log"></div></div>')

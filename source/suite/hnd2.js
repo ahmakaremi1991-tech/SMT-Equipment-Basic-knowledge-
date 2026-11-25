@@ -326,7 +326,7 @@ function drawAoiScreens(m){const [L,R]=m.scr,c=m.ci>=0?m.calls[m.ci]:null;
 
 /* 10 ---- UNLOADER  (triple-magazine line unloader, M size) ---- */
 const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line unloader',L:1080,lanesIn:[0,1],sink:true,z1:RAIL_F+380,
-  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','the shuttle conveyor lines up with lane 1 or 2, the conveyor carries the panel to the end sensor while the pusher waits behind at its reference point; the shuttle lines up with the free slot, the pusher pushes the panel fully into the magazine and returns to reference'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
+  specs:[['Size (L × W × H)','1080 × 1750 × 1750 mm'],['Magazines','3 side by side on one servo lift platform'],['Board in','the shuttle conveyor lines up with lane 1 or 2 and carries the panel to the end sensor; the shuttle lines up with the free slot and the belts drive the panel into the magazine as far as they reach. The pusher (a black lever on a belt actuator) then drops behind the panel, pushes it home and stops at the magazine entrance — it never goes into the magazine — then lifts and returns to its reference point'],['Unloading time','≈ 18–22 s per board (rear magazine)'],['Filling','top to bottom'],['Source','manufacturer product page, technical drawing and brochure + your photo and video']],
   build(m){m.z0=m.z1-1750;buildMagHandler(m,false);},
   reset(m){m.mags=[0,1,2].map(()=>({present:true,boards:new Array(MG.slots).fill(null),lift:0,busy:false}));m.platY=slotPlat(MG.use-1);m.cz=LZ[0];m.rodX=rodRest(m);m.hook=0;m.sens=0;m.ops=0;m.stored=0;},
   accepts(l){return !this.inbox[0].length&&!this.inbox[1].length&&!this.busy[0];},
@@ -339,11 +339,12 @@ const UNLOAD=machine({key:'unloader',name:'UNLOADER',full:'Triple-magazine line 
       const mg=m.mags[i];let k=-1;for(let j=MG.use-1;j>=0;j--)if(!mg.boards[j]){k=j;break;}
       m.state='SHUTTLE TO MAGAZINE '+(i+1)+' · SLOT '+(k+1);const zb=m.cz,p0=m.platY;
       yield* tw(.25+Math.abs(m.magZ[i]-zb)/900,t=>{m.cz=lerp(zb,m.magZ[i],ease(t));b.z=m.cz;m.platY=lerp(p0,slotPlat(k),ease(t));});
-      const ref=rodRest(m),edge=b.x-m.cx-BW/2-5,end=m.magX-BW/2-4;
-      m.state='PUSHER DOWN AT REFERENCE';yield* tw(.25,t=>m.hook=t);
-      m.state='PUSHER TO PANEL EDGE';yield* tw(.6,t=>m.rodX=lerp(ref,edge,t));m.sens=0;
-      m.state='PUSH PANEL INTO MAGAZINE SLOT '+(k+1);yield* tw(1.4,t=>{m.rodX=lerp(edge,end,t);b.x=m.X(m.rodX+BW/2+5);});
-      b.inMag=true;mg.boards[k]=b;m.state='END SENSOR → PUSHER BACK TO REFERENCE';yield* tw(.25,t=>m.hook=1-t);const r1=m.rodX;yield* tw(.9,t=>m.rodX=lerp(r1,ref,ease(t)));
+      const ref=rodRest(m),home=m.magX-MG.L/2-2;
+      m.state='BELT FEEDS PANEL INTO MAGAZINE SLOT '+(k+1);yield* conveyTo(b,m.X(m.shX+250-8+BW/2));m.sens=0;
+      m.state='PUSHER LEVER DOWN BEHIND THE PANEL';yield* tw(.25,t=>m.hook=t);
+      const edge=b.x-m.cx-BW/2-3;m.state='PUSHER TO PANEL EDGE';yield* tw(.8,t=>m.rodX=lerp(ref,edge,ease(t)));
+      m.state='PUSH PANEL HOME (PUSHER STOPS AT MAGAZINE ENTRANCE)';yield* tw(.7,t=>{m.rodX=lerp(edge,home,t);b.x=m.X(m.rodX+BW/2+3);});
+      b.inMag=true;mg.boards[k]=b;m.state='PUSHER UP → BACK TO REFERENCE';yield* tw(.25,t=>m.hook=1-t);yield* tw(.9,t=>m.rodX=lerp(home,ref,ease(t)));
       m.stored++;m.outT.push(simTime);m.procT.push(simTime-t0);m.done++;m.busy[0]=false;
       if(mg.boards.slice(0,MG.use).every(x=>x))run(swapMag(m,i,false));}},
   update(m){magBoardsUpdate(m);},
@@ -405,6 +406,7 @@ const views={over:focus,
   follow:()=>{const m=MACH[sel];setHoods(1);const b=boards.filter(b=>b.alive&&b.x>m.x0-300&&b.x<m.x1+300&&Math.abs(b.dy)<5).sort((a,c)=>c.x-a.x)[0]||boards.filter(b=>b.alive&&Math.abs(b.dy)<5)[0];
     if(!b)return;flyTo([b.x-350,CONV_Y+420,b.z+700],[b.x,CONV_Y,b.z],.9);follow={b};},
   line:()=>{flyTo([0,6200,11800],[0,700,0]);},
+  pusher:()=>{if(!lineMode&&MACH[sel]!==UNLOAD)selectMachine(MACH.indexOf(UNLOAD),false);const m=UNLOAD;setHoods(0);if(!xray)$('bXray').click();const x=m.X(-40);flyTo([x-40,CONV_Y+1650,m.cz+330],[x,CONV_Y,m.cz-30]);follow={pusher:true};},
   top:()=>{const m=MACH[sel];setHoods(1);flyTo(lineMode?[0,13000,10]:[m.cx,3600+m.L,10],[lineMode?0:m.cx,900,0]);}};
 let hoodsOpen=0;
 function setHoods(o){hoodsOpen=o;MACH.forEach(m=>m.hoods.forEach(h=>h.target=o));$('bHood').textContent=o?'Close covers':'Open covers';$('bHood').classList.toggle('on',!!o);}
@@ -472,7 +474,8 @@ function frame(){
     if(m.lamps){const run=!paused&&!/WAIT|IDLE/.test(m.state),warn=/OPERATOR|CHANGE|HELD/.test(m.state);m.lamps.g.emissiveIntensity=run?1.8:.05;m.lamps.y.emissiveIntensity=warn||paused?1.8:.05;m.lamps.r.emissiveIntensity=.05;}});
   boards.forEach(b=>{if(!b.alive)return;b.g.position.set(b.x,CONV_Y+BT/2+b.dy,b.z);b.piv.rotation.x=b.flip;});
   if(tween){tween.t+=rdt;const k=ease(Math.min(1,tween.t/tween.dur));camera.position.lerpVectors(tween.p0,tween.p1,k);controls.target.lerpVectors(tween.t0,tween.t1,k);if(k>=1)tween=null;}
-  if(follow&&!tween){if(!follow.b.alive)follow=null;else{_p.set(follow.b.x,CONV_Y,follow.b.z).sub(controls.target);camera.position.add(_p);controls.target.add(_p);}}
+  if(follow&&follow.pusher&&!tween){_p.set(UNLOAD.X(-40),CONV_Y,UNLOAD.cz-30).sub(controls.target);_p.x=0;camera.position.add(_p);controls.target.add(_p);}
+  else if(follow&&!tween){if(!follow.b.alive)follow=null;else{_p.set(follow.b.x,CONV_Y,follow.b.z).sub(controls.target);camera.position.add(_p);controls.target.add(_p);}}
   controls.update();const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(1.5,Math.min(10,dist*.03));camera.updateProjectionMatrix();
   const [W,H]=SMT.size();renderer.setViewport(0,0,W,H);renderer.clear();renderer.shadowMap.needsUpdate=true;renderer.render(scene,camera);
   if(showTags)tags.forEach(t=>{_p.copy(t.v);if(t.m)t.m.g.localToWorld(_p);_p.project(camera);const vis=t.m.g.visible&&_p.z<1&&Math.abs(_p.x)<1&&Math.abs(_p.y)<1;t.el.style.display=vis?'block':'none';if(vis){t.el.style.left=((_p.x+1)/2*W)+'px';t.el.style.top=((1-_p.y)/2*H)+'px';}});

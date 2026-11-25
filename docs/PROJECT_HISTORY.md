@@ -73,3 +73,17 @@ Machine models are **brand-free** on purpose: the repository is public, so no ma
 | Thumbnails | `img/*.jpg` |
 | Build sources | `source/suite/` (see `docs/HOW_TO_CONTINUE.md`) |
 | Headless test / screenshot scripts | `source/suite/tests/` |
+
+## 2026-11-25 — Unloader pusher corrected again (new top-view video)
+The owner filmed the unloader's pusher section from above. The video shows:
+1. The panel comes to the end sensor while the pusher waits at its reference point, raised.
+2. The shuttle lines up with the free slot and the **conveyor belts drive the panel into the magazine as far as they reach**.
+3. The pusher then lowers behind the trailing edge and **pushes the panel home**. The pusher is a black lever on a belt actuator (red belt) beside the conveyor. It **stops at the magazine entrance and never goes into the magazine**.
+4. The lever lifts and returns to its reference point.
+
+Model changes (`handling_parts.js`, shared by the handling line and the sorting line):
+- The actuator now runs to the magazine entrance.
+- The lever pivots on its carriage, with a paddle at the tip.
+- Stored panels sit with the trailing edge just inside the entrance.
+
+The new step sequence is in the sorting line `unloaderRun` and the handling line UNLOAD `run`. A new **Pusher** camera view (top view with X-ray, following the shuttle) is on both pages.

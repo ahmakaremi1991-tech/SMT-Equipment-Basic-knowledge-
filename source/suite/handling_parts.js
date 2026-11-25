@@ -187,28 +187,34 @@ function buildMagHandler(m,isLoader){
   m.car=new THREE.Group();m.g.add(m.car);
   rails(m.car,m.shX-250,m.shX+250,0,CONV_Y,{legs:false});P(m.car,440,40,BD+60,M.aluD,m.shX,CONV_Y-80,0);P(m.car,80,170,80,M.dark,m.shX,CONV_Y-180,0);
   // board mover: a rodless actuator beside the conveyor; its finger runs 13 mm above the board, i.e. through the gap between two boards
-  const zs=isLoader?-(BD/2+48):(BD/2+48),pa=isLoader?[-20,540]:[-540,20];
-  m.reach=isLoader?440:140;
+  const zs=isLoader?-(BD/2+48):(BD/2+48),entry=m.magX-MG.L/2,pa=isLoader?[-20,540]:[m.shX-340,entry-8];
+  m.reach=isLoader?440:150;
   P(m.car,pa[1]-pa[0],34,30,M.black,(pa[0]+pa[1])/2,CONV_Y+34,zs);
-  if(!isLoader)P(m.car,pa[1]-pa[0]-20,8,2,M.red,(pa[0]+pa[1])/2,CONV_Y+34,zs-16);
+  if(!isLoader)P(m.car,pa[1]-pa[0]-20,8,2,M.red,(pa[0]+pa[1])/2,CONV_Y+34,zs-16);   // red drive belt of the linear actuator
   m.rod=new THREE.Group();m.car.add(m.rod);
-  P(m.rod,60,46,46,M.dark,m.reach,CONV_Y+34,zs);
+  if(isLoader)P(m.rod,60,46,46,M.dark,m.reach,CONV_Y+34,zs);
+  else P(m.rod,60,46,46,M.dark,-m.reach,CONV_Y+34,zs);                               // carriage on the actuator, behind the finger
   if(isLoader){P(m.rod,20,10,Math.abs(zs),M.aluD,m.reach,CONV_Y-58,zs/2);P(m.rod,20,48,20,M.aluD,m.reach,CONV_Y-36,0);
     cyl(m.rod,7,7,m.reach,M.magW,m.reach/2,CONV_Y-13,0,{rz:PI/2,seg:14});}                 // white puller rod runs UNDER the panel
-  else{P(m.rod,20,10,Math.abs(zs),M.aluD,m.reach,CONV_Y+20,zs/2);P(m.rod,m.reach,8,30,M.aluD,m.reach/2,CONV_Y+13,0);}
-  m.finger=new THREE.Group();m.rod.add(m.finger);m.finger.position.y=isLoader?CONV_Y-13:CONV_Y+13;
-  if(isLoader){P(m.finger,10,22,60,M.magW,0,8,0);P(m.finger,14,4,64,M.rubber,0,19,0);}       // finger flips UP behind the far edge
-  else{P(m.finger,10,22,60,M.yellow,0,-8,0);P(m.finger,14,4,64,M.rubber,0,-19,0);}
+  m.finger=new THREE.Group();m.rod.add(m.finger);
+  if(isLoader){m.finger.position.y=CONV_Y-13;P(m.finger,10,22,60,M.magW,0,8,0);P(m.finger,14,4,64,M.rubber,0,19,0);}       // finger flips UP behind the far edge
+  else{// unloader: black lever pivoting on the carriage, pointing downstream; its tip carries a paddle that drops behind the panel's trailing edge
+    const L=m.reach,zi=-BD/4,fz=BD/2-12;m.finger.position.set(-L,CONV_Y+34,0);
+    P(m.finger,L+10,16,18,M.black,L/2,0,zs);                                       // lever arm beside the conveyor
+    P(m.finger,16,14,zs-zi+9,M.black,L-8,-6,(zs+zi)/2);                             // cross bar over the front rail (above it)
+    P(m.finger,8,26,fz-zi,M.yellow,L-4,-21,(fz+zi)/2);                              // paddle between the rails, down to the panel
+    P(m.finger,3,24,fz-zi-4,M.rubber,L,-21,(fz+zi)/2);}                             // rubber pad that touches the panel edge
   m.sensor=new THREE.MeshStandardMaterial({color:0x553300,emissive:0xff9a20,emissiveIntensity:.05});
   P(m.car,16,16,16,m.sensor,isLoader?m.shX-250+8:m.shX+250-8,CONV_Y+22,-(BD/2+18));       // end-of-conveyor sensor
   m.hook=0;
   m.H=H;
-  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller rod (under the panel, finger up)':'Pusher (belt actuator + finger)',m.shX,CONV_Y+120,isLoader?-160:160],['Hinged covers',m.shX,1240,z1-200]];}
+  if(!isLoader)m.seatX=entry+1+BW/2;                                               // stored panel: trailing edge just inside the magazine entrance
+  m.tags=[['Magazine lift platform (3 magazines)',m.magX,1350,m.magZ[1]],['Shuttle conveyor (moves front ↔ back)',m.shX,1240,0],[isLoader?'Puller rod (under the panel, finger up)':'Pusher: lever on a belt actuator, stops at the magazine entrance',m.shX,CONV_Y+120,isLoader?-160:160],['Hinged covers',m.shX,1240,z1-200]];}
 function magBoardsUpdate(m){const off=m.platY;m.plat.position.y=off;
   m.mags.forEach((mg,i)=>{const g=m.magG[i];g.visible=mg.present;g.position.y=mg.lift||0;
-    mg.boards.forEach((b,k)=>{if(b&&b.inMag){b.x=m.X(m.magX);b.z=m.magZ[i];b.dy=off+(mg.lift||0)+MG.base+k*MG.pitch-CONV_Y;}});});
-  m.car.position.z=m.cz;m.rod.position.x=m.rodX;if(m.sensor)m.sensor.emissiveIntensity=m.sens?2.5:.05;m.finger.rotation.z=(m.key==='loader'?1:-1)*(1-m.hook)*1.3;}
-const rodRest=m=>m.key==='loader'?60:m.shX-140;   // finger reference position (machine-local x)
+    mg.boards.forEach((b,k)=>{if(b&&b.inMag){b.x=m.X(m.seatX??m.magX);b.z=m.magZ[i];b.dy=off+(mg.lift||0)+MG.base+k*MG.pitch-CONV_Y;}});});
+  m.car.position.z=m.cz;m.rod.position.x=m.rodX;if(m.sensor)m.sensor.emissiveIntensity=m.sens?2.5:.05;m.finger.rotation.z=m.key==='loader'?(1-m.hook)*1.3:(1-m.hook)*.42;}
+const rodRest=m=>m.key==='loader'?60:m.shX-150;   // finger reference position (machine-local x); unloader: paddle behind the panel at the end sensor
 const slotPlat=k=>CONV_Y-MG.base-k*MG.pitch;
 function* swapMag(m,i,full){const mg=m.mags[i];mg.busy=true;yield 2.5;m.ops++;
   yield* tw(1.2,k=>mg.lift=k*900);mg.present=false;mg.boards.forEach(b=>b&&killBoard(b));mg.boards=new Array(MG.slots).fill(null);
