@@ -87,3 +87,21 @@ Model changes (`handling_parts.js`, shared by the handling line and the sorting 
 - Stored panels sit with the trailing edge just inside the entrance.
 
 The new step sequence is in the sorting line `unloaderRun` and the handling line UNLOAD `run`. A new **Pusher** camera view (top view with X-ray, following the shuttle) is on both pages.
+
+## 2026-11-25 — v2 speed versions of all machine pages (`machines/v2/`)
+The approach approved on the sorting line was applied to every catalogue page: printer, SPI, placement, reflow, AOI and the handling line. The current pages are unchanged; the v2 pages and a comparison page are in `machines/v2/`.
+- **Moving parts are detected automatically.** `tests/probe_dyn.js` runs each page and presses every button, and records every part that moves, turns or hides (`v2/dyn/*.json`). Everything else is merged per material.
+- **Shadows and camera insets** refresh at most 10 times per second; the insets are cached in between.
+- **Nothing is redrawn while paused.**
+- **Instancing:** handling-line panels are instanced; placed components on the placement machine are drawn from one merged layer per lane and material.
+- **Interface:** Quality Auto / High / Low, Performance overlay, loading screen, phone layout.
+
+Draw calls per frame, current → v2:
+- printer 371 → 141
+- SPI 437 → 197
+- placement 1700 → 618
+- reflow 799 → 267
+- AOI 556 → 265
+- handling line 428 → 79
+
+While paused, every page drops to 0. Screenshots of v1 and v2 at the same moments match (the only pixel differences come from log text and timing).
