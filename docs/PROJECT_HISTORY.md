@@ -105,3 +105,6 @@ Draw calls per frame, current → v2:
 - handling line 428 → 79
 
 While paused, every page drops to 0. Screenshots of v1 and v2 at the same moments match (the only pixel differences come from log text and timing).
+
+## 2026-11-25 — v2 is now the main version
+The owner approved v2. `machines/*.html` are now the v2 pages, the previous versions moved to `machines/v1/` (comparison page `machines/v1/index.html`). Catalogue links are unchanged.

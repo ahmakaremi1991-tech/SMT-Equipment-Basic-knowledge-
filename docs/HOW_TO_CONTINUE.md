@@ -39,15 +39,15 @@ node source/suite/tests/check_hnd.js "a|selectMachine(0)|30"
 ```
 Screenshots are written to `out/`, which is git-ignored.
 
-## v2 speed pages (`machines/v2/`)
+## Machine pages = v2 speed versions (`machines/`; previous versions in `machines/v1/`)
 ```
 cd source/suite
-node tests/probe_dyn.js ../../machines/printer.html v2/dyn/printer.json "[machine]" 160      # only after a machine changes
+python3 build4.py printer && node tests/probe_dyn.js /home/user/smt_printer.html v2/dyn/printer.json "[machine]" 160   # only after a machine changes (probe the v1 build: nothing merged)
 python3 build_v2.py                    # printer spi aoi reflow handling_line -> /home/user/smt_v2/*.html (V2_OUT to change)
 python3 build_v2_npm.py                # placement (probe it with V2_PROBE=1 first, see the docstring)
-node tests/perf_all.js ../../machines /home/user/smt_v2      # draw calls before/after
-node tests/visual_v1_v2.js ../../machines /home/user/smt_v2 out/vis   # same moments, screenshots side by side
+node tests/perf_all.js ../../machines/v1 /home/user/smt_v2      # draw calls before/after
+node tests/visual_v1_v2.js ../../machines/v1 /home/user/smt_v2 out/vis   # same moments, screenshots side by side
 ```
-Copy the results into `machines/v2/`. The v2 builders reuse the v1 builders (`build4.py`, `hnd_build.py`, `npm.py`) and add `v2/perf.js` and `v2/v2shim.js`, so changes in the v1 sources reach v2 on the next build.
+Copy the results into `machines/` (these are the main pages). The v2 builders reuse the v1 builders (`build4.py`, `hnd_build.py`, `npm.py`) and add `v2/perf.js` and `v2/v2shim.js`, so changes in the v1 sources reach v2 on the next build.
 
 When a machine model changes, run `probe_dyn.js` again for that page, so the list of moving parts stays correct.

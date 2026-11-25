@@ -43,7 +43,6 @@ def page2(c,key):
     c=dict(c);c['extra_side']=c.get('extra_side','')+QUALITY
     c['stage_html']=LOADING.replace('{fn}',c['fn'])+c['stage_html'];c['css']=c.get('css','')+CSS
     c['overlays']=list(c['overlays'])+[('perf','Performance',False)]
-    c['title']=c['title'].replace(' · SMT',' · v2 · SMT',1) if ' · SMT' in c['title'] else c['title']+' · v2'
     # phones: start with the side panel closed
     c['libs']=c['libs']+"<script>if(innerWidth<820&&(function(){try{return localStorage.getItem('smt-side')===null;}catch(e){return true;}})())document.getElementById('side').classList.add('min');</script>\n"
     return pagemod.page(c)

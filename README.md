@@ -18,6 +18,9 @@ Interactive 3D simulations of an SMT production line, one self-contained HTML fi
 | `machines/placement.html` | Dual-lane, dual-gantry placement machine |
 | `machines/reflow.html` | Dual-lane convection reflow oven (thermal profile, solder joint view, circulation fans) |
 | `machines/aoi.html` | Dual-lane 3D automated optical inspection |
+| `machines/v1/` | Previous (slower) versions of the pages, with a comparison page `machines/v1/index.html` |
+
+Since 2026-11-25 every page is the **v2 speed version**: parts that never move are merged, repeated parts are instanced, shadows and camera insets refresh at most 10× per second, nothing is redrawn while paused, and there is a Graphics quality switch (Auto / High / Low), a Performance overlay and a phone layout.
 
 All pages share the same UI (White / Dark gray theme, collapsible left panel, on-screen data toggles including cycle time), the same millimetre scale, and the same 250 × 200 mm demo PCB.
 Machine models are generic (no brand names) and based on manufacturer datasheets, drawings and reference photos.
